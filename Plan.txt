@@ -1,0 +1,12 @@
+Till 8th November
+1. Learn pygame  
+2. Think of algorithm for rummy AI
+3. See the workflow of the game
+4. Finalising Algo 
+Till 12th November
+5. Creating basic structure. classes and stuff
+6. Writing Algo
+7. Implement basic code to play rummy 
+Till 17th November
+8. Use pygame to add graphics 
+9. Finishing touches 
