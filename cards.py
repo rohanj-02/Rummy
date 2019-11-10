@@ -59,7 +59,7 @@ class Card():
 
 class Deck():
     """
-        A deck object represents the 52 playing cards in a deck.
+        A deck object represents the playing cards in the deck.
 
         Object Attributes:
             cards[] : a list storing all the cards currently in the deck
@@ -70,19 +70,21 @@ class Deck():
             display() : Displays the remaining deck of cards.
             suffle_cards() : Shuffles the cards in the deck.
     """
-    def __init__(self):
+    def __init__(self, no_of_decks):
 
         self.cards = []
         self.discarded = []
-        for s in Suit:
-            for r in Rank:
-                self.cards.append(Card(Rank(r),Suit(s)))
+        for i in range(no_of_decks):
+            for s in Suit:
+                for r in Rank:
+                    self.cards.append(Card(Rank(r),Suit(s)))
 
     def draw_card(self):
         """
             Draws a card from the deck and returns it.
         """
         random_card = random.randint(0, len(self.cards) - 1)
+        self.discarded.append(random_card)
         return self.cards.pop(random_card)
 
     def display(self):
@@ -133,8 +135,8 @@ class Player():
             self.hand.pop(card)
         return None
 
-full_deck = Deck()
-working_deck = Deck()
+full_deck = Deck(2)
+working_deck = Deck(2)
 drawn_card = working_deck.draw_card()
 print(str(drawn_card))
 # drawn_card.display()
