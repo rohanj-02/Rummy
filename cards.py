@@ -4,7 +4,7 @@ import copy
 
 HAND_SIZE = 13
 SUIT = ['spades', 'hearts', 'clubs', 'diamonds']
-RANK = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+RANK = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 RANK_VAL = {'2' : 2, '3' : 3, '4' : 4, '5' : 5, '6' : 6, '7' : 7, '8' : 8, '9' : 9, '10' : 10, 'J' : 11, 'Q' : 12, 'K' : 13,'A' : 14 }
 #global functions
 def sort_by_suit(hand):
@@ -34,24 +34,24 @@ def sort_hand(hand):
             hand : the sorted hand by suit and then by rank
     """
     sort_by_suit(hand)
-    club_hand = []
-    diamond_hand = []
+    clubs_hand = []
+    diamonds_hand = []
     spades_hand = []
     hearts_hand = []
     for i in hand:
-        if i.suit.value == 'clubs':
-            club_hand.append(i)
-        if i.suit.value == 'diamonds':
-            diamond_hand.append(i)
-        if i.suit.value == 'hearts':
-            heart_hand.append(i)
-        if i.suit.hand == 'spades':
+        if i.suit == 'clubs':
+            clubs_hand.append(i)
+        if i.suit == 'diamonds':
+            diamonds_hand.append(i)
+        if i.suit == 'hearts':
+            hearts_hand.append(i)
+        if i.suit == 'spades':
             spades_hand.append(i)
-    sort_by_rank(club_hand)
-    sort_by_rank(diamond_hand)
+    sort_by_rank(clubs_hand)
+    sort_by_rank(diamonds_hand)
     sort_by_rank(spades_hand)
-    sort_by_hand(hearts_hand)
-    sorted_hand = spades_hand + hearts_hand + club_hand + diamond_hand
+    sort_by_rank(hearts_hand)
+    sorted_hand = spades_hand + hearts_hand + clubs_hand + diamonds_hand
     return sorted_hand
 
 def is_set(set):
@@ -65,9 +65,6 @@ def is_set(set):
     """
     if len(set) != 3:
         return False
-    # for i in range(len(set)): # moving joker to the end
-    #     if set[i].is_joker():
-    #         set.append(set.pop(i))
     for i in range(len(set)-1):
         if not set[i].is_joker():
             if set[i].rank != set[i+1].rank:
@@ -89,14 +86,15 @@ def is_sequence(set):
         if set[i].suit != set[0].suit:
             return False
 
-    sort_rank(set)
+    sort_by_rank(set)
     if set[0].rank == '2':
         RANK_VAL['A'] = 1
-        sort_rank(set)
+        sort_by_rank(set)
 
     for i in range(len(set) - 1):
-        if set[i].rank != set[i + 1].rank - 1:
+        if RANK_VAL[set[i].rank] != RANK_VAL[set[i + 1].rank] - 1:
              return False
+    return True
     pass
 
 def is_impure_sequence(set):
@@ -110,52 +108,34 @@ def is_impure_sequence(set):
     """
     RANK_VAL['A'] = 14
     jokers = []
-    for i in range(len(set)):
+    i = 0
+    set = copy.deepcopy(set)
+    while i < len(set):
         if set[i].is_joker():
             jokers.append(set.pop(i))
-            no_of_jokers += 1
-
-    sort_rank(set)
-    if set[0].rank == '2' or set[0].rank == '3':
+            i -= 1
+        i += 1
+    sort_by_rank(set)
+    if set[0].rank == '2' or set[0].rank == '3' or set[0].rank == '4':
         RANK_VAL['A'] = 1
-        sort_rank(set)
+        sort_by_rank(set)
 
-    for i in range(len(set) - 1):
-        if set[i].rank != set[i + 1].rank - 1:
-            if len(jokers) > 0:
-                j = joker.pop(0)
-                j.rank = set[i].rank + 1
-                set = [:i] + j + [i:]
+    i = 0
+    while i < len(set) - 1:
+        if RANK_VAL[set[i].rank] != RANK_VAL[set[i + 1].rank] - 1:
             if len(jokers) == 0:
-                return
+                return False
+            if len(jokers) > 0:
+                j = jokers.pop(0)
+                j.rank = RANK_VAL[set[i].rank] + 1
+                l = list(RANK_VAL.values())
+                k = list(RANK_VAL.keys())
+                j.rank = k[l.index(j.rank)]
+                set = set[:i + 1] + [j] + set[i + 1:]
+                print(list(map(str, set)))
+        i += 1
+    return True
     pass
-
-# class Suit(Enum):
-#     """
-#         An Enum object corresponding to the suits in a playing card Deck.
-#     """
-#     SPADES = 'spades'
-#     HEARTS = 'hearts'
-#     CLUBS = 'clubs'
-#     DIAMONDS = 'diamonds'
-#
-# class Rank(Enum):
-#     """
-#         An Enum object corresponding to the ranks found in a playing card deck.
-#     """
-#     TWO = 2
-#     THREE = 3
-#     FOUR = 4
-#     FIVE = 5
-#     SIX = 6
-#     SEVEN = 7
-#     EIGHT = 8
-#     NINE = 9
-#     TEN = 10
-#     JACK = 11
-#     QUEEN = 12
-#     KING = 13
-#     ACE = 14
 
 class Card():
     """
@@ -169,16 +149,16 @@ class Card():
             display(): Displays the suit and rank of the playing cards
             __str__() : Overloading of the str() operator. str(card) gives "suit-rank"
     """
-    def __init__(self, card_rank, card_suit):
+    def __init__(self, card_rank, card_suit, isjoker = False):
         self.rank = card_rank
         self.suit = card_suit
-        self.isjoker = False
+        self.isjoker = isjoker
 
     def __str__(self):
         """
             Overloading of the str() operator. str(card) gives "suit-rank"
         """
-        return str(self.suit.value) + "-" + str(self.rank.value)
+        return str(self.suit) + "-" + str(self.rank)
 
     def display(self):
         """
@@ -240,12 +220,15 @@ class Deck():
         random.shuffle(self.cards)
         return None
 
-    def set_joker(self):
+    def set_joker(self, jok = None):
         """
             Sets a random card as joker and returns it. Also sets each joker card's isjoker to True.
         """
-        joker = random.randint(0,len(self.cards) - 1)
-        joker = self.cards[joker]
+        if jok == None:
+            joker = random.randint(0,len(self.cards) - 1)
+            joker = self.cards[joker]
+        else:
+            joker = jok
         for i in range(len(self.cards)):
             if self.cards[i].rank == joker.rank:
                 self.cards[i].isjoker = True
@@ -267,11 +250,20 @@ class Player():
             shut_game():
     """
 
-    def __init__(self, name, score = 0, hand = None):
+    def __init__(self, name, score = 0, hand = []):
         self.name = name
         self.score = score
         self.hand = hand
         self.turn = False
+
+    def __str__(self):
+        """
+            Returns the player's hand as suit-rank suit-rank etc.
+        """
+        ans = ""
+        for i in self.hand:
+            ans += str(i) + " "
+        return ans
 
     def discard_card(self, card):
         """
@@ -291,7 +283,7 @@ class Player():
                 deck : The deck in play
         """
         for i in range(HAND_SIZE):
-            self.hands.append(deck.draw_card())
+            self.hand.append(deck.draw_card())
         return None
 
     def shut_game(self):
@@ -302,11 +294,20 @@ class Player():
 
         return False
 
-# full_deck = Deck(2)
-# working_deck = Deck(2)
-# drawn_card = working_deck.draw_card()
-# print(str(drawn_card))
-# drawn_card.display()
-# working_deck.display()
-# working_deck.shuffle_cards()
-# working_deck.display()
+full_deck = Deck(2)
+player1 = Player('Rohan')
+jok = full_deck.set_joker(Card('J','spades'))
+player1.deal_cards(full_deck)
+print(str(player1))
+player1.hand = sort_hand(player1.hand)
+print(str(player1))
+print(str(jok))
+#testing is sequence is set is impure sequence
+Set1 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
+Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
+Set3 = [Card('2', 'spades'), Card('A', 'spades'), Card('K', 'spades'), Card('3','spades')]
+Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
+Set5 = [Card('K', 'spades',True), Card('A', 'hearts'), Card('4','hearts'), Card('9', 'diamonds', True)]
+Set6 = [Card('J', 'spades', True), Card('5', 'hearts'), Card('6', 'clubs')]
+print(is_impure_sequence(Set5))
+print(list(map(str, Set5)))
