@@ -47,3 +47,6 @@ Type of card | Points
 All unmatched cards | 80
 Unmatched J, Q, K or 10 | 10 each
 Rest of unmatched card | Its rank value eg. an unmatched 2 = 2 points
+
+
+**Rules as given in** [OctroRummy](https://rummy.octro.com/tutorial/)
