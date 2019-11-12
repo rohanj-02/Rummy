@@ -1,6 +1,7 @@
 # Rummy
-A variation of the card game rummy using python and pygame
-** Players : ** User and Computer
+A variation of the card game rummy using python and pygame.
+
+**Players :** User and Computer
 
 ## Objective
 The objective of the game is to form Runs and Sets and declare your turn as soon as possible. 
@@ -40,7 +41,9 @@ eg. if the card picked and kept visible is 3 hearts then all cards with rank 3 t
 
 ## Scoring
 The unmatched cards of the rest of the players are counted. Even if a player has runs and sets but does not meet the basic requirement of two runs, all the 13 cards are counted as unmatched.  Scoring is as under:
-All unmatched cards| 80 points
-------------- | --------------
-Unmatched J, Q, K or 10 | 10 points each
+
+Type of card | Points
+------------ | -------------
+All unmatched cards | 80
+Unmatched J, Q, K or 10 | 10 each
 Rest of unmatched card | Its rank value eg. an unmatched 2 = 2 points
