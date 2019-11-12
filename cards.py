@@ -124,6 +124,10 @@ def is_impure_sequence(set):
         return False
 
     for i in range(len(set)):
+        if set[i].suit != set[0].suit:
+            return False
+
+    for i in range(len(set)):
         if set[i].rank_val == 1:
             set[i].rank_val = 14
 
@@ -144,10 +148,10 @@ def is_impure_sequence(set):
                 j = jokers[0]
                 j.rank_val = set[i].rank_val + 1
                 set = set[:i + 1] + [j] + set[i + 1:]
-                print(list(map(str, set)))
+                # print(list(map(str, set)))
         i += 1
-
-    jokers[0].rank_val = RANK_VAL[jokers[0].rank]
+    if len(jokers) > 0:
+        jokers[0].rank_val = RANK_VAL[jokers[0].rank]
     return True
     pass
 
@@ -309,31 +313,68 @@ class Player():
             self.hand.append(deck.draw_card())
         return None
 
+    def check_hand_for_4(self):
+        """
+            Returns all the occurences of sequences of size 4 (pure or impure) in the player's hand.
+            Return : A list containing all such sequences
+        """
+        working_hand = copy.deepcopy(self.hand)
+        set_of_4_sequences = []
+        for i in range(len(working_hand)):
+            for j in range(len(working_hand)):
+                for k in range(len(working_hand)):
+                    for l in range(len(working_hand)):
+                        if i != j and j != k and k != l and i != l:
+                            set = [working_hand[i],working_hand[j],working_hand[k],working_hand[l]]
+                            if is_sequence(set) or is_impure_sequence(set):
+                                working_hand[i].ismatched = True
+                                working_hand[j].ismatched = True
+                                working_hand[k].ismatched = True
+                                working_hand[l].ismatched = True
+                                set = sort_hand(set)
+                                if set not in set_of_4_sequences:
+                                    # print("Appending")
+                                    set_of_4_sequences.append(set)
+                                    set = []
+        return set_of_4_sequences
+
     def shut_game(self):
         """
             Shut the game by player.
             Returns True if player can shut the round. Else False
         """
+        #check for sequence of 4
+        return self.check_hand_for_4()
+        #see all possibilties and store in array
+        # allPossible = {}
 
-        return False
+        #check for sequence of 3
+
+        #check for set/sequence of others.
+        # return False
 
 full_deck = Deck(2)
-player1 = Player('Rohan')
-jok = full_deck.set_joker(Card('J','spades'))
-player1.deal_cards(full_deck)
-print(str(player1))
+test_hand = [Card('Q','spades'),Card('2','hearts',True),Card('5','diamonds'),Card('2','diamonds'),Card('8','clubs'),Card('10','clubs'),Card('J','clubs'),Card('9','hearts'),Card('Q','clubs'),Card('K','clubs'),Card('9','clubs')]
+player1 = Player('Rohan', 0 ,test_hand)
+shut = player1.shut_game()
+for i in shut:
+    print(list(map(str,i)))
+# jok = full_deck.set_joker(Card('J','spades'))
+# player1.deal_cards(full_deck)
+# print(str(player1))
 player1.hand = sort_hand(player1.hand)
-print(str(player1))
+# print(str(player1))
 # print(str(jok))
 #testing is sequence is set is impure sequence
 Set1 = [Card('J', 'hearts'), Card('J', 'hearts'), Card('J', 'clubs')]
 Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
-Set3 = [Card('2', 'spades'), Card('A', 'spades'), Card('3','spades')]
+Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
 Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
 Set5 = [Card('K', 'spades',True), Card('A', 'spades'), Card('Q','spades'), Card('2', 'spades')]
 Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
-print(is_set(Set1))
-print(is_set(Set4))
-print(is_sequence(Set2), is_sequence(Set5))
-print(is_impure_sequence(Set5), is_impure_sequence(Set6))
+# print(is_set(Set1))
+# print(is_set(Set4))
+# print(is_impure_sequence(Set3))
+# print(is_sequence(Set2), is_sequence(Set5))
+# print(is_impure_sequence(Set5), is_impure_sequence(Set6))
 # print(list(map(str, Set5)))
