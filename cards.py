@@ -143,7 +143,7 @@ def is_impure_sequence(set):
 
     i = 0
     while i < len(set) - 1:
-        if set[i].rank_val !=set[i + 1].rank_val - 1:
+        if set[i].rank_val != set[i + 1].rank_val - 1:
             if no_jokers == 0:
                 return False
             if no_jokers > 0:
@@ -151,7 +151,6 @@ def is_impure_sequence(set):
                 j = jokers[0]
                 j.rank_val = set[i].rank_val + 1
                 set = set[:i + 1] + [j] + set[i + 1:]
-                # print(list(map(str, set)))
         i += 1
     if len(jokers) > 0:
         jokers[0].rank_val = RANK_VAL[jokers[0].rank]
@@ -183,14 +182,11 @@ class Card():
         """
         return str(self.suit) + "-" + str(self.rank)
 
-    # def __eq__(self,other):
-    #     return self.suit == other.suit and self.rank == other.rank
-
     def isIn(self, l):
         for i in range(len(l)):
             if self.suit == l[i].suit and self.rank == l[i].rank:
                 return i
-        return 0
+        return False
         pass
     def display(self):
         """
@@ -295,8 +291,7 @@ class Player():
         self.hand = hand
         self.turn = False
         self.allPossible = {}
-        self.has_pure = False
-        self.has_four = False
+
 
     def __str__(self):
         """
@@ -314,8 +309,10 @@ class Player():
             Parameters:
                 card : the card to be discarded from the player's hand.
         """
-        if card in self.hand:
-            self.hand.pop(self.hand.index(card))
+        for i in range(len(self.hand)):
+            if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank:
+                self.hand.pop(i)
+                return None
         return None
 
     def deal_cards(self, deck):
@@ -328,86 +325,58 @@ class Player():
             self.hand.append(deck.draw_card())
         return None
 
+    def draw_card(self, card):
+        """
+            Adds given card to the player's hand
+        """
+        self.hand.append(Card(card.rank, card.suit, card.isjoker))
+        pass
+
     def fill_all_possible(self):
         """
             Returns all the occurences of sequences of size 4 (pure or impure) in the player's hand.
             Return : A list containing all such sequences
         """
+        self.allPossible = {}
         working_hand = copy.deepcopy(self.hand)
-        set_of_4_sequences = []
-        # self.allPossible = {}
         for i in range(len(working_hand)):
             for j in range(len(working_hand)):
                 for k in range(len(working_hand)):
+                    if i != j and i != k and j != k:
+                        small_set = [working_hand[i], working_hand[j], working_hand[k]]
+                        small_set = sort_hand(small_set)
+                        small_set_tuple = tuple(small_set)
+                        if small_set_tuple not in self.allPossible.keys():
+                            if is_sequence(small_set):
+                                self.allPossible[small_set_tuple] = "pure"
+                            elif is_impure_sequence(small_set):
+                                self.allPossible[small_set_tuple] = "impure"
+                            elif is_set(small_set):
+                                self.allPossible[small_set_tuple] = "set"
+                            else:
+                                self.allPossible[small_set_tuple] = 'none'
+
                     for l in range(len(working_hand)):
                         if i != j and j != k and k != l and i != l:
                             set = [working_hand[i],working_hand[j],working_hand[k],working_hand[l]]
-                            small_set = [working_hand[i], working_hand[j], working_hand[k]]
-                            small_set = sort_hand(small_set)
-                            small_set_tuple = tuple(small_set)
-                            # print(small_set_tuple)
                             set = sort_hand(set)
                             set_tuple = tuple(set)
-                            if small_set_tuple not in self.allPossible.keys():
-                                if is_sequence(small_set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
-                                    self.allPossible[small_set_tuple] = "pure"
-                                elif is_impure_sequence(small_set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
-                                    self.allPossible[small_set_tuple] = "impure"
-                                elif is_set(set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
-                                    self.allPossible[small_set_tuple] = "set"
-                                else:
-                                    self.allPossible[small_set_tuple] = 'none'
-
                             if set_tuple not in self.allPossible.keys():
                                 if is_sequence(set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
                                     self.allPossible[set_tuple] = "pure"
-                                    # self.has_pure = True
-                                    if set not in set_of_4_sequences:
-                                        set_of_4_sequences.append(set)
                                 elif is_impure_sequence(set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
                                     self.allPossible[set_tuple] = 'impure'
-                                    if set not in set_of_4_sequences:
-                                        set_of_4_sequences.append(set)
                                 elif is_set(set):
-                                    working_hand[i].ismatched = True
-                                    working_hand[j].ismatched = True
-                                    working_hand[k].ismatched = True
-                                    working_hand[l].ismatched = True
                                     self.allPossible[set_tuple] = 'set'
                                 else:
                                     self.allPossible[set_tuple] = 'none'
-                            else:
-                                if self.allPossible[set_tuple] == 'pure' or self.allPossible[set_tuple] == 'impure':
-                                    if set not in set_of_4_sequences:
-                                        set_of_4_sequences.append(set)
-        return set_of_4_sequences
+        pass
 
     def shut_game(self):
         """
             Shut the game by player.
             Returns True if player can shut the round. Else False
         """
-        #check for sequence of 4
         pure_four = []
         pure_three = []
         impure_three = []
@@ -419,97 +388,122 @@ class Player():
                 pure_four.append(k)
             elif len(k) == 4 and v == 'impure':
                 impure_four.append(k)
+                # print("True")
             elif len(k) == 3 and v == 'pure':
                 pure_three.append(k)
             elif len(k) == 3 and v == 'impure':
                 impure_three.append(k)
             elif len(k) == 3 and v == 'set':
                 set_three.append(k)
-        # for i in set_three:
         fillers_impure_four = pure_three + impure_three + set_three
-        #     print(list(map(str, i)))
+        sequences_three = pure_three + impure_three
         hand_copy = copy.deepcopy(self.hand)
-        for i in impure_four:
-            print(list(map(str, i)))
-        for i in range(len(impure_four)):
-            print("1")
+        for i in range(len(impure_four)): # if sequence of 4 is impure
             hand_without_impure = copy.deepcopy(hand_copy)
-            print("length", len(impure_four[i]))
             for j in range(len(impure_four[i])): # to make hand without impure
                 check = impure_four[i][j].isIn(hand_without_impure)
-                if check != 0 :
+                if type(check) != type(False):
                     hand_without_impure.pop(check)
-                    print(impure_four[i][j])
-                    print("Should come 4 times")
             if len(hand_without_impure) == 10:
-                print("length impure", len(hand_without_impure))
+                first_life = impure_four[i]
                 for k in range(len(pure_three)):
-                    # print("2")
                     hand_without_runs = copy.deepcopy(hand_without_impure)
                     for j in range(len(pure_three[k])): # hand_without runs =  hand - 4 impure - 3 pure
                         check2 = pure_three[k][j].isIn(hand_without_runs)
-                        if check2 != 0:
+                        if type(check2) != type(False):
                             hand_without_runs.pop(check2)
-                            print("length2", len(hand_without_runs))
                         else:
                             break
                     if len(hand_without_runs) == 7:
-                            # print("1")
+                        second_life = pure_three[k]
                         for l in range(len(fillers_impure_four)):
                             for m in range(len(fillers_impure_four)):
-                                # for n in range(len(fillers_impure_four)):
-                                if l != m:
-                                        # print("3")
-                                    final_hand = copy.deepcopy(hand_without_runs)
-                                        # print(len(final_hand))
-                                    new_filler = list(fillers_impure_four[l]) + list(fillers_impure_four[m]) # take two at a time and di the same processecen if onesays len == 1 then true/.
-                                        # print(new_filler)
-                                    for j in range(len(new_filler)):
-                                        check3 = new_filler[j].isIn(final_hand)
-                                        if check3 != 0:
-                                                # print("3")
-                                            final_hand.pop(check3)
-                                    print(len(final_hand))
-                                            # else:
-                                            #     break
-                                    if len(final_hand) == 1 :
-                                        return True
-        return False
+                                final_hand = copy.deepcopy(hand_without_runs)
+                                for j in fillers_impure_four[l]:
+                                    check3 = j.isIn(final_hand)
+                                    if type(check3) != type(False):
+                                        final_hand.pop(check3)
+                                for j in fillers_impure_four[m]:
+                                    check3 = j.isIn(final_hand)
+                                    if type(check3) != type(False):
+                                        final_hand.pop(check3)
+                                extras = [fillers_impure_four[l], fillers_impure_four[m]]
+                                if len(final_hand) == 1 :
+                                    total_hand = [first_life] + [second_life] + extras
+                                    return (True, total_hand)
+
+
+        for i in range(len(pure_four)): # if sequence of 4 is pure
+            hand_without_pure = copy.deepcopy(hand_copy)
+            for j in range(len(pure_four[i])): # to make hand without pure
+                check = pure_four[i][j].isIn(hand_without_pure)
+                if type(check) != type(False):
+                    hand_without_pure.pop(check)
+            if len(hand_without_pure) == 10:
+                first_life = pure_four[i]
+                for k in range(len(sequences_three)):
+                    hand_without_runs = copy.deepcopy(hand_without_pure)
+                    for j in range(len(sequences_three[k])): # hand_without runs =  hand - 4 pure
+                        check2 = sequences_three[k][j].isIn(hand_without_runs)
+                        if type(check2) != type(False):
+                            hand_without_runs.pop(check2)
+                        else:
+                            break
+                    if len(hand_without_runs) == 7:
+                        second_life = sequences_three[k]
+                        for l in range(len(fillers_impure_four)):
+                            for m in range(len(fillers_impure_four)):
+                                final_hand = copy.deepcopy(hand_without_runs)
+                                for j in fillers_impure_four[l]:
+                                    check3 = j.isIn(final_hand)
+                                    if type(check3) != type(False):
+                                        final_hand.pop(check3)
+                                for j in fillers_impure_four[m]:
+                                    check3 = j.isIn(final_hand)
+                                    if type(check3) != type(False):
+                                        final_hand.pop(check3)
+                                extras = [fillers_impure_four[l],fillers_impure_four[m]]
+                                if len(final_hand) == 1 :
+                                    total_hand = [first_life] + [second_life] + extras
+                                    return (True, total_hand)
+        return (False, False)
 
 full_deck = Deck(2)
-test_hand = [Card('5','hearts'),Card('2','clubs',True),Card('5','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
+test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
 player1 = Player('Rohan', 0 ,test_hand)
-shut = player1.shut_game()
-print(shut)
-# for i in shut:
-#     print(list(map(str,i)))
-# jok = full_deck.set_joker(Card('J','spades'))
-# player1.deal_cards(full_deck)
-# print(str(player1))
 player1.hand = sort_hand(player1.hand)
-# print(str(player1))
-# print(str(jok))
+print(player1)
+shut = player1.shut_game()
+if shut[0]:
+    for i in shut[1]:
+        print(list(map(str, i)))
+else:
+    print(False)
+player1.discard_card(Card('10','diamonds'))
+player1.discard_card(Card('9','diamonds'))
+player1.draw_card(Card('J', 'hearts',True))
+player1.draw_card(Card('2', 'hearts',True))
+print(player1)
+shut = player1.shut_game()
+if shut[0]:
+    for i in shut[1]:
+        print(list(map(str, i)))
+else:
+    print(False)
+# print(len(player1.allPossible.values()))
+
+player1.hand = sort_hand(player1.hand)
+
 #testing is sequence is set is impure sequence
-Set1 = [Card('J', 'hearts'), Card('J', 'hearts'), Card('J', 'clubs')]
+Set1 = [Card('3', 'clubs'), Card('3', 'hearts'), Card('3', 'spades')]
 Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
 Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
 Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
-Set5 = [Card('K', 'spades',True), Card('A', 'spades'), Card('Q','spades'), Card('2', 'spades')]
+Set5 = [Card('K', 'spades'), Card('A', 'spades'), Card('Q','spades'), Card('2', 'hearts',True)]
 Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
 # print(is_set(Set1))
 # print(is_set(Set4))
 # print(is_impure_sequence(Set3))
 # print(is_sequence(Set2), is_sequence(Set5))
-# print(is_impure_sequence(Set5), is_impure_sequence(Set6))
+# print(is_impure_sequence(Set5))
 # print(list(map(str, Set5)))
-a = Card('5','spades')
-b = Card('6', 'hearts')
-list = [a,b]
-tuple1 = tuple(list)
-tuple2 = (3,4)
-all ={}
-all[tuple1] = 1
-all[tuple2] = 3
-# print(all)
-a = Card('7','diamonds')
-# for k,v in all.i
