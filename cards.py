@@ -22,7 +22,7 @@ def sort_by_rank(hand):
         Parameters:
             hand : The hand of cards to be sorted
     """
-    hand.sort(key = lambda x: RANK_VAL[x.rank])
+    hand.sort(key = lambda x: x.rank_val)
     return None
 
 def sort_hand(hand):
@@ -80,19 +80,23 @@ def is_sequence(set):
             True if set forms pure sequence
             else False
     """
-    RANK_VAL['A'] = 14
-
     for i in range(len(set)):
         if set[i].suit != set[0].suit:
             return False
 
+    for i in range(len(set)):
+        if set[i].rank_val == 1:
+            set[i].rank_val = 14
+
     sort_by_rank(set)
     if set[0].rank == '2':
-        RANK_VAL['A'] = 1
+        for i in range(len(set)):
+            if set[i].rank_val == 14:
+                set[i].rank_val = 1
         sort_by_rank(set)
 
     for i in range(len(set) - 1):
-        if RANK_VAL[set[i].rank] != RANK_VAL[set[i + 1].rank] - 1:
+        if set[i].rank_val != set[i + 1].rank_val - 1:
              return False
     return True
     pass
@@ -106,34 +110,44 @@ def is_impure_sequence(set):
             True if set forms impure sequence
             else False
     """
-    RANK_VAL['A'] = 14
     jokers = []
+    no_jokers = 0
     i = 0
     set = copy.deepcopy(set)
     while i < len(set):
         if set[i].is_joker():
             jokers.append(set.pop(i))
+            no_jokers += 1
             i -= 1
         i += 1
+    if no_jokers >= 2:
+        return False
+
+    for i in range(len(set)):
+        if set[i].rank_val == 1:
+            set[i].rank_val = 14
+
     sort_by_rank(set)
-    if set[0].rank == '2' or set[0].rank == '3' or set[0].rank == '4':
-        RANK_VAL['A'] = 1
+    if set[0].rank == '2' or set[0].rank == '3':
+        for i in range(len(set)):
+            if set[i].rank_val == 14:
+                set[i].rank_val = 1
         sort_by_rank(set)
 
     i = 0
     while i < len(set) - 1:
-        if RANK_VAL[set[i].rank] != RANK_VAL[set[i + 1].rank] - 1:
-            if len(jokers) == 0:
+        if set[i].rank_val !=set[i + 1].rank_val - 1:
+            if no_jokers == 0:
                 return False
-            if len(jokers) > 0:
-                j = jokers.pop(0)
-                j.rank = RANK_VAL[set[i].rank] + 1
-                l = list(RANK_VAL.values())
-                k = list(RANK_VAL.keys())
-                j.rank = k[l.index(j.rank)]
+            if no_jokers > 0:
+                no_jokers -= 1
+                j = jokers[0]
+                j.rank_val = set[i].rank_val + 1
                 set = set[:i + 1] + [j] + set[i + 1:]
                 print(list(map(str, set)))
         i += 1
+
+    jokers[0].rank_val = RANK_VAL[jokers[0].rank]
     return True
     pass
 
@@ -153,6 +167,8 @@ class Card():
         self.rank = card_rank
         self.suit = card_suit
         self.isjoker = isjoker
+        self.rank_val = RANK_VAL[self.rank]
+        self.ismatched = False
 
     def __str__(self):
         """
@@ -172,6 +188,13 @@ class Card():
             Returns true when card is joker else false
         """
         return self.isjoker
+
+    def is_matched(self):
+        """
+            Returns true when card is matched else false
+        """
+        return self.ismatched
+
 
 class Deck():
     """
@@ -305,9 +328,12 @@ print(str(player1))
 #testing is sequence is set is impure sequence
 Set1 = [Card('J', 'hearts'), Card('J', 'hearts'), Card('J', 'clubs')]
 Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
-Set3 = [Card('2', 'spades'), Card('A', 'spades'), Card('K', 'spades'), Card('3','spades')]
+Set3 = [Card('2', 'spades'), Card('A', 'spades'), Card('3','spades')]
 Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
-Set5 = [Card('K', 'spades',True), Card('A', 'hearts'), Card('4','hearts'), Card('9', 'diamonds', True)]
-Set6 = [Card('J', 'spades', True), Card('5', 'hearts'), Card('6', 'clubs')]
+Set5 = [Card('K', 'spades',True), Card('A', 'spades'), Card('Q','spades'), Card('2', 'spades')]
+Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
 print(is_set(Set1))
+print(is_set(Set4))
+print(is_sequence(Set2), is_sequence(Set5))
+print(is_impure_sequence(Set5), is_impure_sequence(Set6))
 # print(list(map(str, Set5)))
