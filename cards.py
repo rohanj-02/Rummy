@@ -63,11 +63,11 @@ def is_set(set):
             True if set forms Set.
             else False
     """
-    if len(set) != 3:
+    if not (len(set) == 3 or len(set) == 4):
         return False
     for i in range(len(set)-1):
         if not set[i].is_joker():
-            if set[i].rank != set[i+1].rank:
+            if set[i].rank != set[i+1].rank or set[i].suit == set[i+1].suit:
                 return False
     return True
 
@@ -301,13 +301,13 @@ player1.deal_cards(full_deck)
 print(str(player1))
 player1.hand = sort_hand(player1.hand)
 print(str(player1))
-print(str(jok))
+# print(str(jok))
 #testing is sequence is set is impure sequence
-Set1 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
+Set1 = [Card('J', 'hearts'), Card('J', 'hearts'), Card('J', 'clubs')]
 Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
 Set3 = [Card('2', 'spades'), Card('A', 'spades'), Card('K', 'spades'), Card('3','spades')]
 Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
 Set5 = [Card('K', 'spades',True), Card('A', 'hearts'), Card('4','hearts'), Card('9', 'diamonds', True)]
 Set6 = [Card('J', 'spades', True), Card('5', 'hearts'), Card('6', 'clubs')]
-print(is_impure_sequence(Set5))
-print(list(map(str, Set5)))
+print(is_set(Set1))
+# print(list(map(str, Set5)))
