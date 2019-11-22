@@ -7,11 +7,11 @@ screen = pygame.display.set_mode((800,600))
 
 #Title and Icon
 pygame.display.set_caption("Rummy")
-icon = pygame.image.load("playing-cards.png")
-pygame.display.set_icon(icon)
+# icon = pygame.image.load("playing-cards.png")
+# pygame.display.set_icon(icon)
 
 #Player
-playerImg = pygame.image.load("spades-queen.png")
+playerImg = pygame.image.load("assets/back-cover.png")
 playerX = 370
 playerY = 480
 def player(x, y):
