@@ -96,9 +96,10 @@ def show_game(screen, player, deck):
         count += 1
     #show pile
     img = deck.show_pile()
-    # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
-    deck.pile.position = (5*padding, 2*(img.get_height() + card_gap + padding))
-    screen.blit(img, (5*padding, 2*(img.get_height() + card_gap + padding)))
+    for i in range(len(img) - 1, -1,-1):
+        # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
+        deck.pile[i].position = (5*padding, 2*(img[i].get_height() + card_gap + padding))
+        screen.blit(img[i], (5*padding, 2*(img[i].get_height() + card_gap + padding)))
     #show Joker
     img = deck.joker.show()
     screen.blit(img, (8*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding)))
@@ -126,19 +127,24 @@ def player_turn(event, mouse_pos):
     shut.check(mouse_pos, event)
     swap.check(mouse_pos, event)
     discard.check(mouse_pos, event)
-    deck.pile.check(mouse_pos,event)
-
+    for i in range(len(deck.pile)):
+        deck.pile[i].check(mouse_pos,event)
     for i in range(len(user.hand)):
         user.hand[i].check(mouse_pos, event)
+
+    if len(deck.pile) != 0 :
+        if deck.pile[0].is_clicked and len(user.hand) == 13:
+                user.draw_card(deck.pile.pop(0))
     i = 0
     while i < len(user.hand):
         # if user.hand[i].is_clicked :
         #     print(i)
-        if user.hand[i].is_clicked and discard_mode :
+        if user.hand[i].is_clicked and discard_mode and len(user.hand) == 14:
             print("Discard ", i)
             user.turn = False
             computer.turn = True
-            deck.pile = Card(user.hand[i].rank, user.hand[i].suit)
+            # if user.hand == 14:
+            deck.update_pile(Card(user.hand[i].rank, user.hand[i].suit))
             user.discard_card(user.hand[i])
             i -= 1
             discard_mode = False
@@ -176,11 +182,9 @@ def player_turn(event, mouse_pos):
         #     insert_mode = False
         #     print("Insert : ", index[0], index[1])
 
-    if deck.pile.is_clicked :
-        user.draw_card(deck.pile)
     if sort.is_clicked :
         user.hand = sort_hand(user.hand)
-    if draw.is_clicked :
+    if draw.is_clicked and len(user.hand) == 13:
         user.draw_card(deck.draw_card())
     if shut.is_clicked:
         if user.shut_game()[0] :

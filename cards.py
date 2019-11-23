@@ -260,7 +260,7 @@ class Deck():
         self.cards = []
         self.discarded = []
         self.joker = None
-        self.pile = None
+        self.pile = []
         for i in range(no_of_decks):
             for s in SUIT:
                 for r in RANK:
@@ -309,17 +309,26 @@ class Deck():
         """
             Updates the card at the open pile of cards.
         """
-        self.pile = copy.deepcopy(card)
+        self.pile.insert(0, copy.deepcopy(card))
         return None
 
     def show_pile(self):
         """
             Returns the image of the card at the pile.
         """
-        img_name = str(self.pile)
-        img = pygame.image.load("assets/"+img_name+".png")
-        img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
-        return img
+        # img_name = str(self.pile)
+        # img = pygame.image.load("assets/"+img_name+".png")
+        # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
+        # return img
+        #
+        img_list = []
+        for card in range(len(self.pile)):
+            if card <= 2 :
+                img = pygame.image.load("assets/"+str(self.pile[card])+".png")
+                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+                img_list.append(img)
+            # i += 1
+        return img_list
 
 
 class Player():
@@ -361,10 +370,11 @@ class Player():
             Parameters:
                 card : the card to be discarded from the player's hand.
         """
-        for i in range(len(self.hand)):
-            if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank:
-                c = self.hand.pop(i)
-                return None
+        if len(self.hand) > 13:
+            for i in range(len(self.hand)):
+                if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank:
+                    c = self.hand.pop(i)
+                    return None
         return None
 
     def deal_cards(self, deck):
@@ -383,7 +393,8 @@ class Player():
         """
             Adds given card to the player's hand
         """
-        self.hand.append(Card(card.rank, card.suit, card.isjoker))
+        if len(self.hand) <= 13 :
+            self.hand.append(Card(card.rank, card.suit, card.isjoker))
         pass
 
     def fill_all_possible(self):
