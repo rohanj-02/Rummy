@@ -236,6 +236,7 @@ class Deck():
 
         self.cards = []
         self.discarded = []
+        self.joker = None
         self.pile = None
         for i in range(no_of_decks):
             for s in SUIT:
@@ -272,13 +273,14 @@ class Deck():
         """
         if jok == None:
             joker = random.randint(0,len(self.cards) - 1)
-            joker = self.cards[joker]
+            self.joker = self.cards[joker]
         else:
-            joker = jok
+            self.joker = jok
+        self.cards.pop(joker)
         for i in range(len(self.cards)):
-            if self.cards[i].rank == joker.rank:
+            if self.cards[i].rank == self.joker.rank:
                 self.cards[i].isjoker = True
-        return joker
+        return self.joker
 
     def update_pile(self, card):
         """
@@ -292,6 +294,7 @@ class Deck():
         """
         img_name = str(self.pile)
         img = pygame.image.load("assets/"+img_name+".png")
+        img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
         return img
 
 
@@ -346,8 +349,10 @@ class Player():
             Parameters:
                 deck : The deck in play
         """
+        hand = []
         for i in range(HAND_SIZE):
-            self.hand.append(deck.draw_card())
+            hand.append(deck.draw_card())
+        self.hand = hand
         return None
 
     def draw_card(self, card):
@@ -498,7 +503,6 @@ class Player():
             Returns a list of images of the card that are present in its hand
         """
         img_list = []
-        i = 0
         for card in self.hand:
             img = pygame.image.load("assets/"+str(card)+".png")
             img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
@@ -506,8 +510,14 @@ class Player():
             # i += 1
         return img_list
 # full_deck = Deck(2)
-test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
-player1 = Player('Rohan', 0 ,test_hand)
+player1 = Player("")
+player2 = Player("")
+d = Deck(1)
+player1.deal_cards(d)
+
+# print(id(player1.hand) == id(player2.hand))
+# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
+# player1 = Player('Rohan', 0 ,test_hand)
 # player1.hand = sort_hand(player1.hand)
 # print(player1)
 # shut = player1.shut_game()
@@ -516,6 +526,8 @@ player1 = Player('Rohan', 0 ,test_hand)
 #         print(list(map(str, i)))
 # else:
 #     print(False)
+deck = Deck(2)
+print(str(deck.draw_card()))
 # player1.discard_card(Card('10','diamonds'))
 # player1.discard_card(Card('9','diamonds'))
 # player1.draw_card(Card('J', 'hearts',True))

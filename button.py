@@ -9,10 +9,10 @@ black = [0,0,0]
 shift = False
 padding = 40
 fontName = "centurygothic"
-screen = pygame.display.set_mode((X,Y))
+# screen = pygame.display.set_mode((X,Y))
 
 #Title and Icon
-pygame.display.set_caption("Rummy")
+# pygame.display.set_caption("Rummy")
 
 class Button():
     """
@@ -69,19 +69,19 @@ class Button():
         screen.blit(self.title_img, self.title_img_rect)
 
 
-nice = Button("NICE")
-
-running = True
-
-while running:
-    nice.display(screen)
-    for event in pygame.event.get():
-        # if nice.click(pygame.mouse.get_pos()):
-            # print("HOVERRR")
-        nice.check(pygame.mouse.get_pos(), event)
-        if nice.is_clicked:
-            print("nice")
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        pygame.display.update()
+# nice = Button("NICE")
+#
+# running = True
+#
+# while running:
+#     nice.display(screen)
+#     for event in pygame.event.get():
+#         # if nice.click(pygame.mouse.get_pos()):
+#             # print("HOVERRR")
+#         nice.check(pygame.mouse.get_pos(), event)
+#         if nice.is_clicked:
+#             print("nice")
+#         if event.type == pygame.QUIT:
+#             pygame.quit()
+#             quit()
+#         pygame.display.update()
