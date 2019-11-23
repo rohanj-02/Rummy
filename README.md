@@ -50,4 +50,5 @@ Rest of unmatched card | Its rank value eg. an unmatched 2 = 2 points
 
 
 **Rules as given in** [OctroRummy](https://rummy.octro.com/tutorial/)
-Cards designed by [@dhruv-dj](https://github.com/dhruv-dj)
+
+Cards designed by [Dhruv Jain](https://github.com/dhruv-dj)
