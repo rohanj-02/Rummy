@@ -50,15 +50,20 @@ user.deal_cards(deck)
 computer.deal_cards(deck)
 deck.shuffle_cards()
 deck.set_joker()
-c = deck.draw_card()
-deck.update_pile(c)
+cardss = deck.draw_card()
+deck.update_pile(cardss)
+draw = Card('A', 'spades')
+swap = Button("Swap", (3*X//4 + 120, 3*Y//4 + 140))
+insert = Button("Insert", (3*X//4 + 120, 3*Y//4))
 sort = Button("Sort",(3*X//4, 3*Y//4))
-draw = Button("Draw", (3*X//4, 3*Y//4 + 70))
 shut = Button("Shut",(3*X//4, 3*Y//4 + 140))
-draw_from_pile = Button("Draw Pile", (3*X//4 + 120, 3*Y/4 + 140))
 discard = Button("Discard",(3*X//4 + 120, 3*Y//4 + 70 ))
 showCP = Button("Show Computer", (3*X//4, Y//2))
-
+user.turn = True
+discard_mode = False
+swap_mode = False
+insert_mode = False
+index = []
 
 def show_game(screen, player, deck):
     images = player.show_hand()
@@ -66,8 +71,10 @@ def show_game(screen, player, deck):
     #Show Player Cards
     for i in images:
         if count < 7:
+            player.hand[count].position = (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap)
             screen.blit(i, (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap))
         else:
+            player.hand[count].position = ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding)
             screen.blit(i, ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding))
         count += 1
     back = pygame.image.load('assets/back.png')
@@ -90,6 +97,7 @@ def show_game(screen, player, deck):
     #show pile
     img = deck.show_pile()
     # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
+    deck.pile.position = (5*padding, 2*(img.get_height() + card_gap + padding))
     screen.blit(img, (5*padding, 2*(img.get_height() + card_gap + padding)))
     #show Joker
     img = deck.joker.show()
@@ -100,32 +108,87 @@ def show_game(screen, player, deck):
     joker_rect.center = [8*(back.get_width() + card_gap) + back.get_width()//2 + padding ,3*(back.get_height() + card_gap + padding)]
     screen.blit(joker, joker_rect)
     #show deck
+    draw.position = (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding))
     screen.blit(back, (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding)))
     #show buttons
     sort.display(screen)
-    draw.display(screen)
     shut.display(screen)
-    draw_from_pile.display(screen)
     discard.display(screen)
     showCP.display(screen)
+    insert.display(screen)
+    swap.display(screen)
 
 def player_turn(event, mouse_pos):
+    global discard_mode, swap_mode, index, insert_mode
     sort.check(mouse_pos, event)
     draw.check(mouse_pos, event)
+    insert.check(mouse_pos,event)
     shut.check(mouse_pos, event)
-    draw_from_pile.check(mouse_pos, event)
+    swap.check(mouse_pos, event)
     discard.check(mouse_pos, event)
+    deck.pile.check(mouse_pos,event)
+
+    for i in range(len(user.hand)):
+        user.hand[i].check(mouse_pos, event)
+    i = 0
+    while i < len(user.hand):
+        # if user.hand[i].is_clicked :
+        #     print(i)
+        if user.hand[i].is_clicked and discard_mode :
+            print("Discard ", i)
+            user.turn = False
+            computer.turn = True
+            deck.pile = Card(user.hand[i].rank, user.hand[i].suit)
+            user.discard_card(user.hand[i])
+            i -= 1
+            discard_mode = False
+        if user.hand[i].is_clicked and swap_mode :
+            index.append(i)
+            if len(index) >= 2:
+                swap_mode = False
+                user.swap(index)
+                print(index[0],index[1]) # got to implement swap function in player class
+                index = []
+        if user.hand[i].is_clicked and insert_mode :
+            index.append(i)
+            if len(index) >= 2:
+                insert_mode = False
+                user.insert(index)
+                print("Insert",index[0],index[1]) # got to implement insert function in player class
+                index = []
+        i += 1
+    if swap.is_clicked or swap_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_s):
+        swap_mode = True
+    #     if event.type == pygame.MOUSEBUTTONDOWN :
+    #         # code to check which card mouse points to
+    #         index = (mouse_pos[0] - padding)// (draw.width + card_gap)
+    #         print(index)
+    #         if index < 7 :
+    #             swap_mode = False
+    if insert.is_clicked or insert_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_i):
+        insert_mode = True
+        # ind = (mouse_pos[0] - padding)// (draw.width + card_gap)
+        # print(ind)
+        # if mouse_pos[1] < Y and mouse_pos[1] > Y - draw.width - padding:
+        #     ind += 7
+        # index.append(ind)
+        # if len(index) > 2:
+        #     insert_mode = False
+        #     print("Insert : ", index[0], index[1])
+
+    if deck.pile.is_clicked :
+        user.draw_card(deck.pile)
     if sort.is_clicked :
         user.hand = sort_hand(user.hand)
     if draw.is_clicked :
         user.draw_card(deck.draw_card())
-    if draw_from_pile.is_clicked :
-        user.draw_card(deck.pile)
     if shut.is_clicked:
         if user.shut_game()[0] :
             print("True")
         else:
             print("False")
+    if discard.is_clicked or discard_mode:
+        discard_mode = True
     pygame.display.update()
 
     # screen.blit()
@@ -140,12 +203,11 @@ while running:
         screen.blit(heading, heading_rect)
     elif stage[0] == 3:
         show_game(screen, user, deck)
-        # screen.blit(spadeJ.show(), (X//2,Y//2))
     for event in pygame.event.get():
         if stage[0] == 3:
             showCP.check(pygame.mouse.get_pos(), event)
-            player_turn(event, pygame.mouse.get_pos())
-
+            if user.turn :
+                player_turn(event, pygame.mouse.get_pos())
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     user.hand = sort_hand(user.hand)

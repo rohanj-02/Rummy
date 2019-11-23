@@ -1,6 +1,8 @@
 import random
+from copy import deepcopy
 import copy
 import pygame
+from button import Button
 
 HAND_SIZE = 13
 SUIT = ['spades', 'hearts', 'clubs', 'diamonds']
@@ -171,6 +173,13 @@ class Card():
             __str__() : Overloading of the str() operator. str(card) gives "suit-rank"
     """
     def __init__(self, card_rank, card_suit, isjoker = False):
+        self.position = (0,0)
+        img = pygame.image.load('assets/back.png')
+        img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
+        self.is_hover = False
+        self.is_clicked = False
+        self.width = img.get_width()
+        self.height = img.get_height()
         self.rank = card_rank
         self.suit = card_suit
         self.isjoker = isjoker
@@ -216,6 +225,20 @@ class Card():
         card_img = pygame.image.load("assets/"+img_name+".png")
         card_img = pygame.transform.scale(card_img, (card_img.get_width()//4, card_img.get_height()//4))
         return card_img
+
+    def check(self, mouse_pos, event):
+        """
+        """
+        if mouse_pos[0] >= self.position[0] and mouse_pos[0] <= self.position[0] + self.width and mouse_pos[1] >= self.position[1] and mouse_pos[1] <= self.position[1] + self.height:
+            self.is_hover = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.is_hover = False
+                self.is_clicked = True
+            else:
+                self.is_clicked = False
+        else:
+            self.is_clicked = False
+            self.is_hover = False
 
 
 class Deck():
@@ -287,6 +310,7 @@ class Deck():
             Updates the card at the open pile of cards.
         """
         self.pile = copy.deepcopy(card)
+        return None
 
     def show_pile(self):
         """
@@ -339,7 +363,7 @@ class Player():
         """
         for i in range(len(self.hand)):
             if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank:
-                self.hand.pop(i)
+                c = self.hand.pop(i)
                 return None
         return None
 
@@ -498,6 +522,21 @@ class Player():
                                     return (True, total_hand)
         return (False, False)
 
+    def swap(self, index):
+        index.sort()
+        first = self.hand.pop(index[0])
+        second = self.hand.pop(index[1]-1)
+        self.hand.insert(index[0], second)
+        self.hand.insert(index[1], first)
+
+    def insert(self, index):
+        if index[0] > index[1]:
+            elem = self.hand.pop(index[0])
+            self.hand.insert(index[1] + 1, elem)
+        else:
+            elem = self.hand.pop(index[0])
+            self.hand.insert(index[1], elem)
+
     def show_hand(self):
         """
             Returns a list of images of the card that are present in its hand
@@ -510,10 +549,10 @@ class Player():
             # i += 1
         return img_list
 # full_deck = Deck(2)
-player1 = Player("")
-player2 = Player("")
-d = Deck(1)
-player1.deal_cards(d)
+# player1 = Player("")
+# player2 = Player("")
+# d = Deck(1)
+# player1.deal_cards(d)
 
 # print(id(player1.hand) == id(player2.hand))
 # test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
@@ -526,8 +565,8 @@ player1.deal_cards(d)
 #         print(list(map(str, i)))
 # else:
 #     print(False)
-deck = Deck(2)
-print(str(deck.draw_card()))
+# deck = Deck(2)
+# print(str(deck.draw_card()))
 # player1.discard_card(Card('10','diamonds'))
 # player1.discard_card(Card('9','diamonds'))
 # player1.draw_card(Card('J', 'hearts',True))
