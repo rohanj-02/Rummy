@@ -214,6 +214,7 @@ class Card():
         """
         img_name = str(self)
         card_img = pygame.image.load("assets/"+img_name+".png")
+        card_img = pygame.transform.scale(card_img, (card_img.get_width()//4, card_img.get_height()//4))
         return card_img
 
 
@@ -292,6 +293,7 @@ class Deck():
         img_name = str(self.pile)
         img = pygame.image.load("assets/"+img_name+".png")
         return img
+
 
 class Player():
     """
@@ -498,8 +500,10 @@ class Player():
         img_list = []
         i = 0
         for card in self.hand:
-            img_list[i] = pygame.image.load("assets/"+str(card)+".png")
-            i += 1
+            img = pygame.image.load("assets/"+str(card)+".png")
+            img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+            img_list.append(img)
+            # i += 1
         return img_list
 # full_deck = Deck(2)
 test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
