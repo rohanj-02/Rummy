@@ -1,5 +1,6 @@
 import random
 import copy
+import pygame
 
 HAND_SIZE = 13
 SUIT = ['spades', 'hearts', 'clubs', 'diamonds']
@@ -207,6 +208,14 @@ class Card():
         """
         return self.ismatched
 
+    def show(self):
+        """
+            Returns image object to render the card on the screen
+        """
+        img_name = str(self)
+        card_img = pygame.image.load("assets/"+img_name+".png")
+        return card_img
+
 
 class Deck():
     """
@@ -226,6 +235,7 @@ class Deck():
 
         self.cards = []
         self.discarded = []
+        self.pile = None
         for i in range(no_of_decks):
             for s in SUIT:
                 for r in RANK:
@@ -269,6 +279,20 @@ class Deck():
                 self.cards[i].isjoker = True
         return joker
 
+    def update_pile(self, card):
+        """
+            Updates the card at the open pile of cards.
+        """
+        self.pile = copy.deepcopy(card)
+
+    def show_pile(self):
+        """
+            Returns the image of the card at the pile.
+        """
+        img_name = str(self.pile)
+        img = pygame.image.load("assets/"+img_name+".png")
+        return img
+
 class Player():
     """
         Object of this classes represents a player.
@@ -291,7 +315,6 @@ class Player():
         self.hand = hand
         self.turn = False
         self.allPossible = {}
-
 
     def __str__(self):
         """
@@ -468,42 +491,52 @@ class Player():
                                     return (True, total_hand)
         return (False, False)
 
-full_deck = Deck(2)
+    def show_hand(self):
+        """
+            Returns a list of images of the card that are present in its hand
+        """
+        img_list = []
+        i = 0
+        for card in self.hand:
+            img_list[i] = pygame.image.load("assets/"+str(card)+".png")
+            i += 1
+        return img_list
+# full_deck = Deck(2)
 test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
 player1 = Player('Rohan', 0 ,test_hand)
-player1.hand = sort_hand(player1.hand)
-print(player1)
-shut = player1.shut_game()
-if shut[0]:
-    for i in shut[1]:
-        print(list(map(str, i)))
-else:
-    print(False)
-player1.discard_card(Card('10','diamonds'))
-player1.discard_card(Card('9','diamonds'))
-player1.draw_card(Card('J', 'hearts',True))
-player1.draw_card(Card('2', 'hearts',True))
-print(player1)
-shut = player1.shut_game()
-if shut[0]:
-    for i in shut[1]:
-        print(list(map(str, i)))
-else:
-    print(False)
-# print(len(player1.allPossible.values()))
-
-player1.hand = sort_hand(player1.hand)
-
-#testing is sequence is set is impure sequence
-Set1 = [Card('3', 'clubs'), Card('3', 'hearts'), Card('3', 'spades')]
-Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
-Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
-Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
-Set5 = [Card('K', 'spades'), Card('A', 'spades'), Card('Q','spades'), Card('2', 'hearts',True)]
-Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
-# print(is_set(Set1))
-# print(is_set(Set4))
-# print(is_impure_sequence(Set3))
-# print(is_sequence(Set2), is_sequence(Set5))
-# print(is_impure_sequence(Set5))
-# print(list(map(str, Set5)))
+# player1.hand = sort_hand(player1.hand)
+# print(player1)
+# shut = player1.shut_game()
+# if shut[0]:
+#     for i in shut[1]:
+#         print(list(map(str, i)))
+# else:
+#     print(False)
+# player1.discard_card(Card('10','diamonds'))
+# player1.discard_card(Card('9','diamonds'))
+# player1.draw_card(Card('J', 'hearts',True))
+# player1.draw_card(Card('2', 'hearts',True))
+# print(player1)
+# shut = player1.shut_game()
+# if shut[0]:
+#     for i in shut[1]:
+#         print(list(map(str, i)))
+# else:
+#     print(False)
+# # print(len(player1.allPossible.values()))
+#
+# player1.hand = sort_hand(player1.hand)
+#
+# #testing is sequence is set is impure sequence
+# Set1 = [Card('3', 'clubs'), Card('3', 'hearts'), Card('3', 'spades')]
+# Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
+# Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
+# Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
+# Set5 = [Card('K', 'spades'), Card('A', 'spades'), Card('Q','spades'), Card('2', 'hearts',True)]
+# Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
+# # print(is_set(Set1))
+# # print(is_set(Set4))
+# # print(is_impure_sequence(Set3))
+# # print(is_sequence(Set2), is_sequence(Set5))
+# # print(is_impure_sequence(Set5))
+# # print(list(map(str, Set5)))
