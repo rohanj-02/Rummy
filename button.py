@@ -3,7 +3,7 @@ pygame.init()
 
 X = 1360
 Y = 768
-color1 = [100,50,100]
+color1 = [250,250,250]
 color2 = [50,100,100]
 black = [0,0,0]
 shift = False
@@ -24,9 +24,9 @@ class Button():
         self.is_clicked = False
         self.is_hover = False
         self.height = height
-        self.color = [50,50,50]
-        self.hover_color = [0,0,255]
-        self.click_color = [0,255,0]
+        self.color = [240,0,40]
+        self.hover_color = [220,0,0]
+        self.click_color = [177,15,46]
         self.font = pygame.font.Font(fontname, 25)
         self.title_img = self.font.render(self.title, True, color1)
         self.title_img_rect = self.title_img.get_rect()

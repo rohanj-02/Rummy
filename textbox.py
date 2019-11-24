@@ -3,8 +3,8 @@ import pygame
 
 X = 1360
 Y = 768
-color1 = [100,50,100]
-color2 = [50,100,100]
+color1 = [17,75,95]
+color2 = [23,170,170]
 black = [0,0,0]
 shift = False
 padding = 40
@@ -21,7 +21,7 @@ class TextBox():
         """
         self.title = title
         self.text = ""
-        self.font = pygame.font.Font(fontName, 50)
+        self.font = pygame.font.Font(fontName, 40)
         self.font_img = self.font.render(self.text, True, color1)
         self.title_img = self.font.render(self.title, True, color1)
         self.title_img_rect = self.title_img.get_rect()
