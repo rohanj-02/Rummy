@@ -24,7 +24,7 @@ pygame.display.set_icon(icon)
 #
 #GLOBAL VARIABLES
 
-stage = [0]
+stage = [5]
 fontName = "centuryGothic.ttf"
 running = True
 black = [0,0,0]
@@ -277,9 +277,10 @@ def round_over():
     if deal_mode:
         deal -= 1
         if deal != 0 :
-            game_over = True
+            winner.score += 1
             text = winner.name + ' has won this round!'
         else:
+            game_over = True
             winner.score += 1
             if user.score > computer.score:
                 text = user.name + ' has won the game!'
@@ -291,14 +292,15 @@ def round_over():
     winner_text_rect = winner_text.get_rect()
     winner_text_rect.center = [X//2, Y//4]
     winn = []
-    for i in winning_hand :
-        winn += [i]
+    for i in winning_hand[1] :
+        for j in i:
+            winn.append(j)
     winning_hand = winn
     new_round = Button("Next Round", (X - 2*padding - 200, Y - 125), 200, 50, "Montserrat-Regular.ttf")
     play_again = Button("Play Again", (X - 2*padding - 200, Y - 125), 200, 50, "Montserrat-Regular.ttf")
 
 def round_over_display():
-    global winner_text, winner_text_rect, winning_hand, game_over, new_round
+    global winner_text, winner_text_rect, winning_hand, game_over, new_round,stage
     screen.blit(winner_text, winner_text_rect)
     i = 0
     for card in winning_hand:
@@ -362,11 +364,11 @@ def before_game_reset():
 # winner = user
 # deal_mode = True
 # deal = 1
-# winning_hand = user.hand
+# winning_hand = [True,[user.hand]]
 # round_over()
 
 ##########################
-before_game_reset()
+# before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
