@@ -198,6 +198,7 @@ class Card():
                 return i
         return False
         pass
+
     def display(self):
         """
             Displays the suit and rank of the playing card

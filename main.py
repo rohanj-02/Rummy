@@ -23,42 +23,67 @@ pygame.display.set_icon(icon)
 #
 #GLOBAL VARIABLES
 
-stage = [1]
+stage = [0]
 fontName = "centurygothic"
 running = True
 black = [0,0,0]
 card_gap = 10
 padding = 20
-
+points_mode = False
+deal_mode = False
 #Stage 0 :
 heading_font = pygame.font.Font("Pacifico-Regular.ttf", 200)
+button_font = pygame.font.Font("montserrat.ttf", 30)
 heading = heading_font.render("Rummy", True, textbox.color2)
 heading_rect = heading.get_rect()
 heading_rect.center = [X//2, Y//4]
 
+#Stage 0:
+start = Button("Start", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "montserrat.ttf")
+start.set_center((X // 2, 3*Y // 4))
 #Stage 1 :
-name = TextBox("Enter Name : ")
+name = TextBox("Enter Name")
+name.set_center((X // 2, 5*Y // 8 ), (X//2, 5*Y//8 + 70))
 #Stage 2 :
-rounds = TextBox("Enter Rounds : ")
+points_rummy = Button("Points Rummy", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "montserrat.ttf")
+points_rummy.set_center((X // 2, 3*Y // 4))
+deal_rummy = Button("Deal Rummy", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "montserrat.ttf")
+deal_rummy.set_center((X // 2, 3*Y // 4 + 70))
 #Stage 3 :
-#Instructions .. will be dealt with later
+# rounds = TextBox("Enter Rounds")
+points_text = button_font.render("Choose number of points", True, textbox.color1)
+points_text_rect = points_text.get_rect()
+points_text_rect.center = (X//2,3*Y//4)
+deal_text = button_font.render("Choose number of deals", True, textbox.color1)
+deal_text_rect = deal_text.get_rect()
+deal_text_rect.center = (X//2,3*Y//4)
+points_100 = Button("101 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "montserrat.ttf")
+points_100.set_center((X // 2, 3*Y // 4 + 70))
+points_200 = Button("201 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "montserrat.ttf")
+points_200.set_center((X // 2, 3*Y // 4 + 140))
+deal_1 = Button("1", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "montserrat.ttf")
+deal_1.set_center((X // 2, 3*Y // 4 + 70))
+deal_3 = Button("3", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "montserrat.ttf")
+deal_3.set_center((X // 2 + 60, 3*Y // 4 + 70))
+deal_5 = Button("5", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "montserrat.ttf")
+deal_5.set_center((X // 2 + 120, 3*Y // 4 + 70))
 #Stage 4 :
 deck = Deck(2)
 user = Player("Rohan",5)
 computer = Player("PC")
-user.deal_cards(deck)
-computer.deal_cards(deck)
 deck.shuffle_cards()
 deck.set_joker()
+user.deal_cards(deck)
+computer.deal_cards(deck)
 cardss = deck.draw_card()
 deck.update_pile(cardss)
 draw = Card('A', 'spades')
-swap = Button("Swap", (3*X//4 + 120, 3*Y//4 + 140))
-insert = Button("Insert", (3*X//4 + 120, 3*Y//4))
-sort = Button("Sort",(3*X//4, 3*Y//4))
-shut = Button("Shut",(3*X//4, 3*Y//4 + 140))
-discard = Button("Discard",(3*X//4 + 120, 3*Y//4 + 70 ))
-showCP = Button("Show Computer", (3*X//4, Y//2))
+swap = Button("Swap", (3*X//4 + 120, 3*Y//4 + 140), 100, 50, "montserrat.ttf")
+insert = Button("Insert", (3*X//4 + 120, 3*Y//4), 100, 50, "montserrat.ttf")
+sort = Button("Sort",(3*X//4, 3*Y//4), 100, 50, "montserrat.ttf")
+shut = Button("Shut",(3*X//4, 3*Y//4 + 140), 100, 50, "montserrat.ttf")
+discard = Button("Discard",(3*X//4 + 120, 3*Y//4 + 70 ), 100, 50, "montserrat.ttf")
+showCP = Button("Show Computer", (3*X//4, Y//2), 100, 50, "montserrat.ttf")
 user.turn = True
 discard_mode = False
 swap_mode = False
@@ -71,11 +96,13 @@ def show_game(screen, player, deck):
     #Show Player Cards
     for i in images:
         if count < 7:
-            player.hand[count].position = (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap)
-            screen.blit(i, (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap))
+            pos = (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap)
+            player.hand[count].position = pos
+            screen.blit(i, pos)
         else:
-            player.hand[count].position = ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding)
-            screen.blit(i, ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding))
+            pos = ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding)
+            player.hand[count].position = pos
+            screen.blit(i, pos)
         count += 1
     back = pygame.image.load('assets/back.png')
     back = pygame.transform.scale(back, (back.get_width()//4,back.get_height()//4))
@@ -98,8 +125,9 @@ def show_game(screen, player, deck):
     img = deck.show_pile()
     for i in range(len(img) - 1, -1,-1):
         # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
-        deck.pile[i].position = (5*padding, 2*(img[i].get_height() + card_gap + padding))
-        screen.blit(img[i], (5*padding, 2*(img[i].get_height() + card_gap + padding)))
+        pos = (5*padding, 2*(img[i].get_height() + card_gap + padding))
+        deck.pile[i].position = pos
+        screen.blit(img[i], pos)
     #show Joker
     img = deck.joker.show()
     screen.blit(img, (8*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding)))
@@ -109,8 +137,9 @@ def show_game(screen, player, deck):
     joker_rect.center = [8*(back.get_width() + card_gap) + back.get_width()//2 + padding ,3*(back.get_height() + card_gap + padding)]
     screen.blit(joker, joker_rect)
     #show deck
-    draw.position = (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding))
-    screen.blit(back, (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding)))
+    pos = (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding))
+    draw.position = pos
+    screen.blit(back, pos)
     #show buttons
     sort.display(screen)
     shut.display(screen)
@@ -119,7 +148,7 @@ def show_game(screen, player, deck):
     insert.display(screen)
     swap.display(screen)
 
-def player_turn(event, mouse_pos):
+def player_turn(mouse_pos, event):
     global discard_mode, swap_mode, index, insert_mode
     sort.check(mouse_pos, event)
     draw.check(mouse_pos, event)
@@ -137,14 +166,10 @@ def player_turn(event, mouse_pos):
                 user.draw_card(deck.pile.pop(0))
     i = 0
     while i < len(user.hand):
-        # if user.hand[i].is_clicked :
-        #     print(i)
         if user.hand[i].is_clicked and discard_mode and len(user.hand) == 14:
-            print("Discard ", i)
             user.turn = False
             computer.turn = True
-            # if user.hand == 14:
-            deck.update_pile(Card(user.hand[i].rank, user.hand[i].suit))
+            deck.update_pile(Card(user.hand[i].rank, user.hand[i].suit, user.hand[i].isjoker))
             user.discard_card(user.hand[i])
             i -= 1
             discard_mode = False
@@ -153,72 +178,128 @@ def player_turn(event, mouse_pos):
             if len(index) >= 2:
                 swap_mode = False
                 user.swap(index)
-                print(index[0],index[1]) # got to implement swap function in player class
                 index = []
         if user.hand[i].is_clicked and insert_mode :
             index.append(i)
             if len(index) >= 2:
                 insert_mode = False
                 user.insert(index)
-                print("Insert",index[0],index[1]) # got to implement insert function in player class
                 index = []
         i += 1
     if swap.is_clicked or swap_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_s):
         swap_mode = True
-    #     if event.type == pygame.MOUSEBUTTONDOWN :
-    #         # code to check which card mouse points to
-    #         index = (mouse_pos[0] - padding)// (draw.width + card_gap)
-    #         print(index)
-    #         if index < 7 :
-    #             swap_mode = False
+        insert_mode = False
+        discard_mode = False
     if insert.is_clicked or insert_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_i):
         insert_mode = True
-        # ind = (mouse_pos[0] - padding)// (draw.width + card_gap)
-        # print(ind)
-        # if mouse_pos[1] < Y and mouse_pos[1] > Y - draw.width - padding:
-        #     ind += 7
-        # index.append(ind)
-        # if len(index) > 2:
-        #     insert_mode = False
-        #     print("Insert : ", index[0], index[1])
-
-    if sort.is_clicked :
+        swap_mode = False
+        discard_mode = False
+    if sort.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) :
         user.hand = sort_hand(user.hand)
-    if draw.is_clicked and len(user.hand) == 13:
+    if (draw.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_d)) and len(user.hand) == 13:
         user.draw_card(deck.draw_card())
     if shut.is_clicked:
         if user.shut_game()[0] :
             print("True")
         else:
             print("False")
-    if discard.is_clicked or discard_mode:
+    if discard.is_clicked or discard_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_d):
         discard_mode = True
+        swap_mode = False
+        insert_mode = False
     pygame.display.update()
 
-    # screen.blit()
+def computer_turn():
+    # computer.draw_card(deck.pile.pop(0))
+    # computer.hand = sort_hand(computer.hand)
+    # deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
+    # computer.discard_card(computer.hand[-1])
+    computer.fill_all_possible()
+    # see max matching right now
+    # see max matching after addition of pile card
+    # see max matching after addition of joker
+    # if max matching right now == max matching after pile == max matching after joker:
+    # draw card and then discard highest of unmatched
+    # if max matching of pile > max matching now :
+    # pick pile and then throw highest unmatched card
+    # if max matching of joker > max matching of pile
+    # draw card and then pop highest unmatched
+    computer.turn = False
+    user.turn = True
+
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
+    if stage[0] == 0:
+        screen.blit(heading, heading_rect)
+        start.display(screen)
     if stage[0] == 1:
         display_testbox(name, screen)
         screen.blit(heading, heading_rect)
     elif stage[0] == 2:
-        display_testbox(rounds, screen)
+        # display_testbox(rounds, screen)
+        points_rummy.display(screen)
+        deal_rummy.display(screen)
         screen.blit(heading, heading_rect)
     elif stage[0] == 3:
+        if points_mode:
+            screen.blit(points_text, points_text_rect)
+            points_100.display(screen)
+            points_200.display(screen)
+        elif deal_mode:
+            screen.blit(deal_text, deal_text_rect)
+            deal_1.display(screen)
+            deal_3.display(screen)
+            deal_5.display(screen)
+    elif stage[0] == 4:
         show_game(screen, user, deck)
     for event in pygame.event.get():
-        if stage[0] == 3:
-            showCP.check(pygame.mouse.get_pos(), event)
+        button_parameter = (pygame.mouse.get_pos(), event)
+        if stage[0] == 4:
+            showCP.check(button_parameter[0], button_parameter[1])
             if user.turn :
-                player_turn(event, pygame.mouse.get_pos())
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    user.hand = sort_hand(user.hand)
+                player_turn(button_parameter[0], button_parameter[1])
+            if computer.turn :
+                computer_turn()
+        if stage[0] == 3:
+            if points_mode :
+                points_100.check(button_parameter[0], button_parameter[1])
+                points_200.check(button_parameter[0], button_parameter[1])
+                if points_100.is_clicked:
+                    target = 100
+                    stage[0] += 1
+                if points_200.is_clicked :
+                    target = 200
+                    stage[0] += 1
+            if deal_mode:
+                deal_1.check(button_parameter[0], button_parameter[1])
+                deal_3.check(button_parameter[0], button_parameter[1])
+                deal_5.check(button_parameter[0], button_parameter[1])
+                if deal_1.is_clicked:
+                    deals = 1
+                    stage[0] += 1
+                if deal_3.is_clicked:
+                    deals = 3
+                    stage[0] += 1
+                if deal_5.is_clicked:
+                    deals = 5
+                    stage[0] += 1
         if stage[0] == 2:
-            input_textbox(rounds, event, stage)
+            points_rummy.check(button_parameter[0], button_parameter[1])
+            deal_rummy.check(button_parameter[0], button_parameter[1])
+            if points_rummy.is_clicked or deal_rummy.is_clicked :
+                stage[0] += 1
+            if points_rummy.is_clicked :
+                points_mode = True
+            if deal_rummy.is_clicked:
+                deal_mode = True
+            # input_textbox(rounds, event, stage)
         elif stage[0] == 1:
             input_textbox(name, event, stage)
+        elif stage[0] == 0 :
+            start.check(button_parameter[0], button_parameter[1])
+            if start.is_clicked:
+                stage[0] += 1
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()

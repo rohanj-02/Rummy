@@ -8,13 +8,13 @@ color2 = [50,100,100]
 black = [0,0,0]
 shift = False
 padding = 40
-fontName = "centuryGothic.ttf"
+fontName = "montserrat.ttf"
 
 class Button():
     """
         class defined to present a button to perform some function
     """
-    def __init__(self, title = "Button", position = (X//2,Y//2), width = 100, height = 50):
+    def __init__(self, title = "Button", position = (X//2,Y//2), width = 100, height = 50, fontname = fontName):
         """
             Parameters : Title of Button
         """
@@ -24,10 +24,10 @@ class Button():
         self.is_clicked = False
         self.is_hover = False
         self.height = height
-        self.color = [0,0,0]
+        self.color = [50,50,50]
         self.hover_color = [0,0,255]
         self.click_color = [0,255,0]
-        self.font = pygame.font.Font(fontName, 25)
+        self.font = pygame.font.Font(fontname, 25)
         self.title_img = self.font.render(self.title, True, color1)
         self.title_img_rect = self.title_img.get_rect()
         self.title_img_rect.center = (self.position[0] + self.width //2, self.position[1] + self.height//2)
@@ -63,3 +63,7 @@ class Button():
         else:
             pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.width, self.height))
         screen.blit(self.title_img, self.title_img_rect)
+
+    def set_center(self, pos):
+        self.title_img_rect.center = pos
+        self.position = (pos[0] - self.width // 2, pos[1] - self.height // 2)

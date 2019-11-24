@@ -8,7 +8,7 @@ color2 = [50,100,100]
 black = [0,0,0]
 shift = False
 padding = 40
-fontName = "centurygothic"
+fontName = "centuryGothic.ttf"
 
 
 class TextBox():
@@ -21,7 +21,7 @@ class TextBox():
         """
         self.title = title
         self.text = ""
-        self.font = pygame.font.SysFont(fontName, 50)
+        self.font = pygame.font.Font(fontName, 50)
         self.font_img = self.font.render(self.text, True, color1)
         self.title_img = self.font.render(self.title, True, color1)
         self.title_img_rect = self.title_img.get_rect()
@@ -44,7 +44,12 @@ class TextBox():
         rect = self.img_rect.center
         self.font_img = self.font.render(self.text, True, color1)
         self.img_rect = self.font_img.get_rect()
-        self.img_rect.center = [self.title_img.get_width() + self.font_img.get_width()//2 + padding, 5*Y//8]
+        # self.img_rect.center = [self.title_img.get_width() + self.font_img.get_width()//2 + padding, 5*Y//8]
+        self.img_rect.center = rect
+
+    def set_center(self, pos_title, pos_input):
+        self.title_img_rect.center = pos_title
+        self.img_rect.center = pos_input
 
 
 def input_textbox(textbox, event, stage):
