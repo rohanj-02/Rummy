@@ -252,10 +252,10 @@ def player_turn(mouse_pos, event):
     pygame.display.update()
 
 def computer_turn():
-    # computer.draw_card(deck.pile.pop(0))
-    # computer.hand = sort_hand(computer.hand)
-    # deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
-    # computer.discard_card(computer.hand[-1])
+    computer.draw_card(deck.pile.pop(0))
+    computer.hand = sort_hand(computer.hand)
+    deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
+    computer.discard_card(computer.hand[-1])
     computer.fill_all_possible()
     # see max matching right now
     # see max matching after addition of pile card
