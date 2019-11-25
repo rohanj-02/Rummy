@@ -454,7 +454,6 @@ class Player():
                 pure_four.append(k)
             elif len(k) == 4 and v == 'impure':
                 impure_four.append(k)
-                # print("True")
             elif len(k) == 3 and v == 'pure':
                 pure_three.append(k)
             elif len(k) == 3 and v == 'impure':
@@ -560,6 +559,99 @@ class Player():
             img_list.append(img)
             # i += 1
         return img_list
+
+    def max_matched(self):
+        self.fill_all_possible()
+        allPossible = {}
+        acceptable = ["pure","impure","set"]
+        for k,v in self.allPossible.items():
+            if v in acceptable:
+                allPossible[k] = v
+        max = []
+        max_elem = 0
+        max_pure = False
+        max_four = False
+        new_four = False
+        new_pure = False
+        new = []
+        new_elem = 0
+        for i in allPossible.keys():
+            new = i
+            if len(allPossible[i]) == 4:
+                new_four = True
+            if allPossible[i] == "pure":
+                new_pure = True
+            new_elem = len(i)
+            for j in allPossible.keys():
+                new_j = copy.deepcopy(new)
+                new_elem_j = new_elem
+                ans = False
+                for s in range(len(j)):
+                    check = j[s].isIn(new_j)
+                    if type(check) != type(False):
+                        ans = True
+                if not ans:
+                    if len(allPossible[j]) == 4:
+                        new_four = True
+                    if allPossible[j] == "pure":
+                        new_pure = True
+                    new_j += j
+                    new_elem_j += len(j)
+                for k in allPossible.keys():
+                    new_k = copy.deepcopy(new_j)
+                    new_elem_k = new_elem_j
+                    ans = False
+                    for s in range(len(k)):
+                        check = k[s].isIn(new_k)
+                        if type(check) != type(False):
+                            ans = True
+                    if not ans:
+                        if len(allPossible[k]) == 4:
+                            new_four = True
+                        if allPossible[k] == "pure":
+                            new_pure = True
+                        new_k += k
+                        new_elem_k += len(k)
+                    for l in allPossible.keys():
+                        ans = False
+                        new_l = copy.deepcopy(new_k)
+                        new_elem_l = new_elem_k
+                        for s in range(len(l)):
+                            check = l[s].isIn(new_l)
+                            if type(check) != type(False):
+                                ans = True
+                        if not ans:
+                            if len(allPossible[l]) == 4:
+                                new_four = True
+                            if allPossible[l] == "pure":
+                                new_pure = True
+                            new_l += l
+                            new_elem_l += len(l)
+                        if max_elem < new_elem_l:
+                            max = copy.deepcopy(new_l)
+                            max_elem = new_elem_l
+                            max_four = new_four
+                            max_pure = new_pure
+                        if max_elem == new_elem_l:
+                            if new_four and max_four:
+                                if new_pure and (not max_pure):
+                                    max = copy.deepcopy(new_l)
+                                    max_elem = new_elem_l
+                                    max_four = new_four
+                                    max_pure = new_pure
+                            if new_four and (not max_four):
+                                max = copy.deepcopy(new)
+                                max_elem = new_elem_l
+                                max_four = new_four
+                                max_pure = new_pure
+        return (max, max_elem, max_four, max_pure)
+
+    def return_unmatched(self, matched):
+        working_hand = copy.deepcopy(self.hand)
+        for i in matched:
+            working_hand.pop(working_hand.index(i))
+        working_hand = sort_hand(working_hand)
+        return working_hand[-1]
 # full_deck = Deck(2)
 # player1 = Player("")
 # player2 = Player("")
@@ -567,7 +659,8 @@ class Player():
 # player1.deal_cards(d)
 
 # print(id(player1.hand) == id(player2.hand))
-# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','hearts'),Card('10','diamonds')]
+
+
 # player1 = Player('Rohan', 0 ,test_hand)
 # player1.hand = sort_hand(player1.hand)
 # print(player1)
@@ -607,3 +700,21 @@ class Player():
 # # print(is_sequence(Set2), is_sequence(Set5))
 # # print(is_impure_sequence(Set5))
 # # print(list(map(str, Set5)))
+
+
+# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
+# player1 = Player("Rohan", 0, test_hand)
+# player1.fill_all_possible()
+# allPossible = {}
+# acceptable = ["pure","impure","set"]
+# for k,v in player1.allPossible.items():
+#     if v in acceptable:
+#         allPossible[k] = v
+# print(len(allPossible.keys()))
+# print(len(player1.allPossible.keys()))
+# max = player1.max_matched()
+# for i in max[0]:
+#     print(str(i))
+# for i in max:
+#     if type(i) != tuple:
+#         print(i)

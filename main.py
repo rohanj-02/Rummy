@@ -24,7 +24,7 @@ pygame.display.set_icon(icon)
 #
 #GLOBAL VARIABLES
 
-stage = [5]
+stage = [0]
 fontName = "centuryGothic.ttf"
 running = True
 black = [0,0,0]
@@ -60,9 +60,9 @@ points_text_rect.center = (X//2,5*Y//8)
 deal_text = button_font.render("Choose number of deals", True, textbox.color1)
 deal_text_rect = deal_text.get_rect()
 deal_text_rect.center = (X//2,5*Y//8)
-points_100 = Button("101 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
+points_100 = Button("100 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
 points_100.set_center((X // 2, 5*Y // 8 + 70))
-points_200 = Button("201 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
+points_200 = Button("200 Points", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
 points_200.set_center((X // 2, 5*Y // 8 + 140))
 deal_1 = Button("1", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "Montserrat-Regular.ttf")
 deal_1.set_center((X // 2 - 60, 5*Y // 8 + 70))
@@ -128,7 +128,7 @@ def show_game(screen, player, deck):
     screen.blit(computer_name, computer_name_rect)
     screen.blit(name_text, name_rect)
     screen.blit(score_text, score_rect)
-    user_score
+    # user_score
     images = player.show_hand()
     count = 0
     #Show Player Cards
@@ -252,11 +252,35 @@ def player_turn(mouse_pos, event):
     pygame.display.update()
 
 def computer_turn():
-    computer.draw_card(deck.pile.pop(0))
-    computer.hand = sort_hand(computer.hand)
-    deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
-    computer.discard_card(computer.hand[-1])
-    computer.fill_all_possible()
+    # computer.draw_card(deck.draw_card())
+    # computer.hand = sort_hand(computer.hand)
+    # deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
+    # computer.discard_card(computer.hand[-1])
+    # computer.fill_all_possible()
+    # max_normal = computer.max_matched()
+    # new_card = copy.deepcopy(deck.pile[0])
+    # random_joker = Card("J","spades", True)
+    # computer.hand.append(new_card)
+    # max_after_pile = computer.max_matched()
+    # computer.hand.pop(computer.hand.index(new_card))
+    # computer.hand.append(random_joker)
+    # max_after_joker = computer.max_matched()
+    # computer.hand.pop(computer.hand.index(random_joker))
+    # if len(max_normal[0]) == len(max_after_joker[0]) == len(max_after_pile[0]):
+    #     computer.draw_card(deck)
+    #     card = computer.return_unmatched(max_after_joker[0])
+    #     computer.discard_card(card)
+    #     deck.update_pile(card)
+    # if len(max_after_joker[0]) > len(max_after_pile):
+    #     computer.draw_card(deck.draw_card())
+    #     card = computer.return_unmatched(max_after_joker[0])
+    #     computer.discard_card(card)
+    #     deck.update.pile(card)
+    # elif len(max_after_joker[0]) == len(max_after_pile):
+    #     computer.draw_card(deck.pile.pop(0))
+    #     card = computer.return_unmatched(max_after_joker[0])
+    #     computer.discard_card(card)
+    #     deck.update.pile(card)
     # see max matching right now
     # see max matching after addition of pile card
     # see max matching after addition of joker
@@ -368,7 +392,7 @@ def before_game_reset():
 # round_over()
 
 ##########################
-# before_game_reset()
+before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
@@ -418,7 +442,7 @@ while running:
             showCP.check(button_parameter[0], button_parameter[1])
             if user.turn :
                 player_turn(button_parameter[0], button_parameter[1])
-            if computer.turn :
+            elif computer.turn :
                 computer_turn()
 
         elif stage[0] == 3:
