@@ -24,11 +24,11 @@ pygame.display.set_icon(icon)
 #
 #GLOBAL VARIABLES
 
-stage = [0]
+stage = [4]
 fontName = "centuryGothic.ttf"
 running = True
 black = [0,0,0]
-card_gap = 10
+card_gap = 15
 padding = 20
 points_mode = False
 deal_mode = False
@@ -132,18 +132,18 @@ def show_game(screen, player, deck):
     images = player.show_hand()
     count = 0
     #Show Player Cards
+    back = pygame.image.load('assets/back.png')
+    back = pygame.transform.scale(back, (back.get_width()//4,back.get_height()//4))
     for i in images:
         if count < 7:
-            pos = (count*(i.get_width() + card_gap)+ padding ,Y - 2*i.get_height() - padding- card_gap)
+            pos = (count*(back.get_width() + card_gap)+ padding ,Y - 2*back.get_height() - padding- card_gap + player.hand[count].offset)
             player.hand[count].position = pos
             screen.blit(i, pos)
         else:
-            pos = ((count-7)*(i.get_width() + card_gap)+ padding ,Y - i.get_height() - padding)
+            pos = ((count-7)*(back.get_width() + card_gap)+ padding ,Y - back.get_height() - padding + player.hand[count].offset)
             player.hand[count].position = pos
             screen.blit(i, pos)
         count += 1
-    back = pygame.image.load('assets/back.png')
-    back = pygame.transform.scale(back, (back.get_width()//4,back.get_height()//4))
     count = 0
     #Show computer cards
     images = computer.show_hand()
@@ -234,7 +234,7 @@ def player_turn(mouse_pos, event):
         discard_mode = False
     if sort.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) :
         user.hand = sort_hand(user.hand)
-    if (draw.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_d)) and len(user.hand) == 13:
+    if (draw.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE)) and len(user.hand) == 13:
         user.draw_card(deck.draw_card())
     if shut.is_clicked:
         winning_hand = user.shut_game()
@@ -252,6 +252,7 @@ def player_turn(mouse_pos, event):
     pygame.display.update()
 
 def computer_turn():
+    global winner, winning_hand
     # computer.draw_card(deck.draw_card())
     # computer.hand = sort_hand(computer.hand)
     # deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
@@ -290,6 +291,70 @@ def computer_turn():
     # pick pile and then throw highest unmatched card
     # if max matching of joker > max matching of pile
     # draw card and then pop highest unmatched
+    computer.draw_card(deck.pile[0])
+    winning_hand = computer.shut_game()
+    if winning_hand[0]:
+        #winning condition
+        winner = computer
+        round_over()
+        stage[0] += 1
+    else:
+        score = [0] * 14
+        min_pile = (0, 100)
+        for i in range(len(computer.hand)):
+            score[i] = calculate_score(computer.hand[i], computer.hand)
+        for i in range(len(score)):
+            if score[i] < min_pile[1]:
+                min_pile = (i,score[i])
+            elif score[i] == min_pile[1]:
+                if computer.hand[i].rank >= computer.hand[min_pile[0]].rank:
+                    min_pile = (i, score[i])
+
+    computer.discard_card(deck.pile[0])
+
+    joker_card = Card('3','spades',True)
+    computer.draw_card(joker_card)
+    score = [0] * 14
+    min_deck = (0, 100)
+    for i in range(len(computer.hand)):
+        score[i] = calculate_score(computer.hand[i], computer.hand)
+    for i in range(len(score)):
+        if score[i] < min_deck[1]:
+            min_deck = (i,score[i])
+        elif score[i] == min_deck[1]:
+            if computer.hand[i].rank >= computer.hand[min_deck[0]].rank:
+                min_deck = (i, score[i])
+    computer.discard_card(joker_card)
+
+
+    if min_pile[1] <= min_deck[1]:
+        #draw from pile
+        computer.draw_card(deck.pile.pop(0))
+        #delay here
+        deck.update_pile(computer.hand[min_pile[0]])
+        computer.discard_card(computer.hand[min_pile[0]])
+    else:
+        #draw from deck
+        computer.draw_card(deck.draw_card())
+        winning_hand = computer.shut_hand()
+        if winning_hand[0] :
+            #winning condition
+            winner = computer
+            round_over()
+            stage[0] += 1
+        else:
+            score = [0] * 14
+            min_deck = (0, 100)
+            for i in range(len(computer.hand)):
+                score[i] = calculate_score(computer.hand[i], computer.hand)
+            for i in range(len(score)):
+                if score[i] < min_deck[1]:
+                    min_deck = (i,score[i])
+                elif score[i] == min_deck[1]:
+                    if computer.hand[i].rank >= computer.hand[min_deck[0]].rank:
+                        min_deck = (i, score[i])
+            deck.update_pile(computer.hand[min_deck[0]])
+            computer.discard_card(computer.hand[min_deck[0]])
     computer.turn = False
     user.turn = True
 
@@ -390,7 +455,8 @@ def before_game_reset():
 # deal = 1
 # winning_hand = [True,[user.hand]]
 # round_over()
-
+# computer = Player("ds", 0, test_hand)
+# computer_turn()
 ##########################
 before_game_reset()
 #GAME LOOP
@@ -491,4 +557,5 @@ while running:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+
     pygame.display.update()

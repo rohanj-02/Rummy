@@ -160,6 +160,114 @@ def is_impure_sequence(set):
     return True
     pass
 
+def calculate_score(card, hand):
+
+    if card.isjoker:
+        return 50
+    hand == copy.deepcopy(hand)
+    score = 0
+
+    if card.rank == '2':
+        for i in range(len(hand)):
+            if hand[i].rank_val == 14:
+                hand[i].rank_val == 1
+
+        card_three = Card('3', card.suit, card.isjoker)
+        if card_three.isIn(hand):
+            score += 10
+        card_ace = Card('A', card.suit, card.isjoker)
+        if card_ace.isIn(hand):
+            score += 10
+        card_four = Card('4', card.suit, card.isjoker)
+        if card_four.isIn(hand):
+            score += 5
+        for i in SUIT:
+            if i != card.suit:
+                same_rank_card = Card(card.rank, i, card.isjoker)
+                if same_rank_card.isIn(hand):
+                    score += 10
+        return score
+
+    if card.rank == '3':
+        for i in range(len(hand)):
+            if hand[i].rank_val == 14:
+                hand[i].rank_val == 1
+
+    if card.rank == 'K':
+        for i in range(len(hand)):
+            if hand[i].rank_val == 1:
+                hand[i].rank_val == 14
+
+        card_queen = Card('Q', card.suit, card.isjoker)
+        if card_queen.isIn(hand):
+            score += 10
+        card_ace = Card('A', card.suit, card.isjoker)
+        if card_ace.isIn(hand):
+            score += 10
+        card_jack = Card('J', card.suit, card.isjoker)
+        if card_jack.isIn(hand):
+            score += 5
+        for i in SUIT:
+            if i != card.suit:
+                same_rank_card = Card(card.rank, i, card.isjoker)
+                if same_rank_card.isIn(hand):
+                    score += 10
+        return score
+
+    if card.rank == 'Q':
+        for i in range(len(hand)):
+            if hand[i].rank_val == 1:
+                hand[i].rank_val == 14
+
+    if card.rank == 'A':
+        card_queen = Card('Q', card.suit, card.isjoker)
+        if card_queen.isIn(hand):
+            score += 5
+        card_king = Card('K', card.suit, card.isjoker)
+        if card_king.isIn(hand):
+            score += 10
+        card_two = Card('2', card.suit, card.isjoker)
+        if card_two.isIn(hand):
+            score += 10
+        card_three = Card('3', card.suit, card.isjoker)
+        if card_three.isIn(hand):
+            score += 5
+        for i in SUIT:
+            if i != card.suit:
+                same_rank_card = Card(card.rank, i, card.isjoker)
+                if same_rank_card.isIn(hand):
+                    score += 10
+        return score
+
+    list_cards = []
+    for i in range(-2,3):
+        if i != 0 :
+            if int(card.rank_val) + i <= 10:
+                list_cards.append(Card(str(int(card.rank_val) + i), card.suit, card.isjoker))
+            elif int(card.rank_val) + i == 1:
+                list_cards.append(Card('A', card.suit, card.isjoker))
+            elif int(card.rank_val) + i == 11:
+                list_cards.append(Card('J', card.suit, card.isjoker))
+            elif int(card.rank_val) + i == 12:
+                list_cards.append(Card('Q', card.suit, card.isjoker))
+            elif int(card.rank_val) + i == 13:
+                list_cards.append(Card('K', card.suit, card.isjoker))
+            elif int(card.rank_val) + i == 14:
+                list_cards.append(Card('A', card.suit, card.isjoker))
+    for i in range(len(list_cards)):
+        if list_cards[i].isIn(hand):
+            if i == 2 or i == 1:
+                score += 10
+            else:
+                score += 5
+    for i in SUIT:
+        if i != card.suit:
+            same_rank_card = Card(card.rank, i, card.isjoker)
+            if same_rank_card.isIn(hand):
+                score += 10
+    return score
+
+
 class Card():
     """
         It represents a card in a playing card deck
@@ -183,6 +291,7 @@ class Card():
         self.rank = card_rank
         self.suit = card_suit
         self.isjoker = isjoker
+        self.offset = 0
         self.rank_val = RANK_VAL[self.rank]
         self.ismatched = False
 
@@ -373,8 +482,9 @@ class Player():
         """
         if len(self.hand) > 13:
             for i in range(len(self.hand)):
-                if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank:
+                if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank and self.hand[i].isjoker == card.isjoker:
                     c = self.hand.pop(i)
+                    print(c)
                     return None
         return None
 
@@ -555,10 +665,22 @@ class Player():
         img_list = []
         for card in self.hand:
             img = pygame.image.load("assets/"+str(card)+".png")
-            img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+            if card.is_hover == True:
+                card.offset = -10
+                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+            else:
+                card.offset = 0
+                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
             img_list.append(img)
             # i += 1
         return img_list
+
+    def return_unmatched(self, matched):
+        working_hand = copy.deepcopy(self.hand)
+        for i in matched:
+            working_hand.pop(working_hand.index(i))
+        working_hand = sort_hand(working_hand)
+        return working_hand[-1]
 
     def max_matched(self):
         self.fill_all_possible()
@@ -646,12 +768,7 @@ class Player():
                                 max_pure = new_pure
         return (max, max_elem, max_four, max_pure)
 
-    def return_unmatched(self, matched):
-        working_hand = copy.deepcopy(self.hand)
-        for i in matched:
-            working_hand.pop(working_hand.index(i))
-        working_hand = sort_hand(working_hand)
-        return working_hand[-1]
+
 # full_deck = Deck(2)
 # player1 = Player("")
 # player2 = Player("")
