@@ -16,8 +16,22 @@ icon = pygame.image.load('assets/icon.png')
 pygame.display.set_icon(icon)
 deal_card_sound = pygame.mixer.Sound("assets/dealcard.wav")
 correct_declare = pygame.mixer.Sound("assets/correctdeclare.wav")
-# sound.play()
 wrong_declare = pygame.mixer.Sound("assets/wrongdeclare.wav")
+padding = 20
+#TUTORIAL DEFINITIONS
+next = Button('Next', (0,0), 100, 50, "Montserrat-Regular.ttf")
+next.set_center((X - next.width//2 - padding, 7*Y//8))
+skip = Button('Skip', (0,0), 100, 50,"Montserrat-Regular.ttf")
+skip.set_center((X - skip.width//2 - padding, Y//8))
+finish = Button('Finish', (0,0), 100, 50,"Montserrat-Regular.ttf")
+finish.set_center((X - finish.width//2 - padding, 7*Y//8))
+last_stage = 10
+spades = Card('A', "spades")
+clubs = Card('A', "clubs")
+diamonds = Card('A', "diamonds")
+hearts = Card('A', 'hearts')
+
+
 #
 # Stage 0 : Start
 # Stage 1 : Take name
@@ -29,7 +43,7 @@ wrong_declare = pygame.mixer.Sound("assets/wrongdeclare.wav")
 #
 #GLOBAL VARIABLES
 
-stage = [0]
+stage = [0,0]
 fontName = "centuryGothic.ttf"
 running = True
 black = [0,0,0]
@@ -50,6 +64,8 @@ heading_rect.center = [X//2, Y//4]
 #Stage 0:
 start = Button("Start", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
 start.set_center((X // 2, 5*Y // 8))
+how_to = Button("How To Play?",(0,0), 200, 50, "Montserrat-Regular.ttf")
+how_to.set_center((X//2, 5*Y//8 + start.height + padding))
 #Stage 1 :
 name = TextBox("Enter Name")
 name.set_center((X // 2, 5*Y // 8 ), (X//2, 5*Y//8 + 70))
@@ -452,6 +468,38 @@ def before_game_reset():
     game_reset()
     winning_reset()
 
+def tutorial_show():
+    global stage
+    #Add code to display how to play above. looks weird right now
+    if stage[1] != last_stage:
+        next.display(screen)
+        skip.display(screen)
+    else:
+        finish.display(screen)
+    if stage[1] == 0:
+        text = text_font.render("Rummy is played by 2 players, user and computer. It is played with 2 deck of cards.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (X//2 - padding, Y//8)
+        screen.blit(text, text_rect)
+    pass
+
+def tutorial_check(mouse_pos, event):
+    global stage
+    if stage[1] != last_stage:
+        next.check(mouse_pos, event)
+        skip.check(mouse_pos, event)
+        if skip.is_clicked:
+            stage[0] = 0
+            stage[1] = 0
+        if next.is_clicked:
+            stage[1] += 1
+
+    else:
+        finish.check(mouse_pos, event)
+        if finish.is_clicked:
+            stage[0] = 0
+            stage[1] = 0
+
 ##############################
 #
 # winner = user
@@ -466,11 +514,15 @@ before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
-    if stage[0] <= 3:
+    if stage[0] == -1:
+        tutorial_show()
+
+    if stage[0] <= 3 and stage[0] >= 0:
         screen.blit(heading, heading_rect)
 
     if stage[0] == 0:
         start.display(screen)
+        how_to.display(screen)
 
     elif stage[0] == 1:
         display_testbox(name, screen)
@@ -564,8 +616,15 @@ while running:
 
         elif stage[0] == 0 :
             start.check(button_parameter[0], button_parameter[1])
+            how_to.check(button_parameter[0], button_parameter[1])
             if start.is_clicked:
                 stage[0] += 1
+            if how_to.is_clicked :
+                stage[0] = -1
+                stage[1] = 0
+
+        elif stage[0] == -1:
+            tutorial_check(button_parameter[0], button_parameter[1])
 
         if event.type == pygame.QUIT:
             pygame.quit()
