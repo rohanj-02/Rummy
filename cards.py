@@ -408,7 +408,10 @@ class Deck():
             joker = random.randint(0,len(self.cards) - 1)
             self.joker = self.cards[joker]
         else:
-            self.joker = jok
+            for i in range(len(self.cards)):
+                if self.cards[i].rank == jok.rank and self.cards[i].suit == jok.suit:
+                    self.joker = jok
+                    joker = i
         self.cards.pop(joker)
         for i in range(len(self.cards)):
             if self.cards[i].rank == self.joker.rank:
@@ -734,7 +737,7 @@ class Player():
 # # print(list(map(str, Set5)))
 
 
-# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
+test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
 # player1 = Player("Rohan", 0, test_hand)
 # player1.fill_all_possible()
 # allPossible = {}

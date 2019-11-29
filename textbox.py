@@ -67,7 +67,7 @@ def input_textbox(textbox, event, stage):
             textbox.text = textbox.text[:-1]
             textbox.update()
         elif event.key == pygame.K_RETURN:
-            stage[0] += 1
+            stage[0] = 3
         else:
             if shift:
                 textbox.update_text(event.key - 32)

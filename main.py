@@ -20,17 +20,14 @@ wrong_declare = pygame.mixer.Sound("assets/wrongdeclare.wav")
 padding = 20
 #TUTORIAL DEFINITIONS
 next = Button('Next', (0,0), 100, 50, "Montserrat-Regular.ttf")
-next.set_center((X - next.width//2 - padding, 7*Y//8))
+next.set_center((X - next.width//2 - padding, Y - next.height/2 - padding))
 skip = Button('Skip', (0,0), 100, 50,"Montserrat-Regular.ttf")
-skip.set_center((X - skip.width//2 - padding, Y//8))
+skip.set_center((X - skip.width//2 - padding, skip.height//2 + padding))
 finish = Button('Finish', (0,0), 100, 50,"Montserrat-Regular.ttf")
-finish.set_center((X - finish.width//2 - padding, 7*Y//8))
-last_stage = 10
-spades = Card('A', "spades")
-clubs = Card('A', "clubs")
-diamonds = Card('A', "diamonds")
-hearts = Card('A', 'hearts')
-
+finish.set_center((X - finish.width//2 - padding, Y - next.height/2 - padding))
+last_stage = 5
+back = pygame.image.load('assets/back.png')
+card_width = back.get_width()
 
 #
 # Stage 0 : Start
@@ -50,13 +47,15 @@ black = [0,0,0]
 card_gap = 15
 padding = 20
 points_mode = False
-deal_mode = False
+deal_mode = True
 target = 0
 deal = 0
 # Heading :
 heading_font = pygame.font.Font("Pacifico-Regular.ttf", 200)
 button_font = pygame.font.Font("Montserrat-Regular.ttf", 30)
 text_font = pygame.font.Font(fontName, 30)
+textbox_font = pygame.font.Font(fontName, 20)
+small_font = pygame.font.Font(fontName, 15)
 heading = heading_font.render("Rummy", True, textbox.color2)
 heading_rect = heading.get_rect()
 heading_rect.center = [X//2, Y//4]
@@ -93,20 +92,21 @@ deal_5 = Button("5", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "Montserrat-Regular.t
 deal_5.set_center((X // 2 + 60, 5*Y // 8 + 70))
 #Stage 4 :
 deck = Deck(2)
-user = Player("Rohan")
-computer = Player("PC")
+test_hand.pop(-1)
+user = Player("Rohan",0, test_hand)
+computer = Player("Computer")
 deck.shuffle_cards()
 deck.set_joker()
-user.deal_cards(deck)
+# user.deal_cards(deck)
 computer.deal_cards(deck)
 cardss = deck.draw_card()
 deck.update_pile(cardss)
 draw = Card('A', 'spades')
-swap = Button("Swap", (3*X//4 + 140, 3*Y//4 + 140), 120, 50, "Montserrat-Regular.ttf")
-insert = Button("Insert", (3*X//4 + 140, 3*Y//4), 120, 50, "Montserrat-Regular.ttf")
-sort = Button("Sort",(3*X//4, 3*Y//4), 120, 50, "Montserrat-Regular.ttf")
-declare = Button("Declare",(3*X//4, 3*Y//4 + 70), 120, 50, "Montserrat-Regular.ttf")
-discard = Button("Discard",(3*X//4 + 140, 3*Y//4 + 70 ), 120, 50, "Montserrat-Regular.ttf")
+swap = Button("Swap",(3*X//4, 3*Y//4) , 120, 50, "Montserrat-Regular.ttf")
+insert = Button("Insert", (3*X//4 + 140, 3*Y//4 - 70), 120, 50, "Montserrat-Regular.ttf")
+sort = Button("Sort",(3*X//4, 3*Y//4 - 70), 120, 50, "Montserrat-Regular.ttf")
+declare = Button("Declare", (3*X//4, 3*Y//4 + 70) , 260, 50, "Montserrat-Regular.ttf")
+discard = Button("Discard",(3*X//4 + 140, 3*Y//4), 120, 50, "Montserrat-Regular.ttf")
 showCP = Button("Show Computer", (3*X//4, Y//2), 260, 50, "Montserrat-Regular.ttf")
 user_name = text_font.render(user.name, True, textbox.color1)
 user_name_rect = user_name.get_rect()
@@ -477,14 +477,298 @@ def tutorial_show():
     else:
         finish.display(screen)
     if stage[1] == 0:
-        text = text_font.render("Rummy is played by 2 players, user and computer. It is played with 2 deck of cards.", True, textbox.color1)
+        text = text_font.render("Rummy is played by 2 players, user and computer. It is played with 2 decks.", True, textbox.color1)
         text_rect = text.get_rect()
-        text_rect.center = (X//2 - padding, Y//8)
+        text_rect.center = (X//2 - padding - skip.width, Y//8)
+        spade = pygame.image.load('assets/spades-A.png')
+        pos_spade = (5*padding ,Y//2)
+        spade_text = textbox_font.render("Spades", True, textbox.color1)
+        spade_text_rect = spade_text.get_rect()
+        spade_text_rect.center = (pos_spade[0] + spade.get_width()//2, pos_spade[1] + spade.get_height() + padding)
+        heart = pygame.image.load('assets/hearts-A.png')
+        pos_heart = (10*padding + heart.get_width() ,Y//2)
+        heart_text = textbox_font.render("Hearts", True, textbox.color1)
+        heart_text_rect = heart_text.get_rect()
+        heart_text_rect.center = (pos_heart[0] + spade.get_width()//2, pos_heart[1] + spade.get_height() + padding)
+        screen.blit(heart, pos_heart)
+        screen.blit(heart_text, heart_text_rect)
+        club = pygame.image.load('assets/clubs-A.png')
+        pos_club = (15*padding + 2*heart.get_width() ,Y//2)
+        club_text = textbox_font.render("Clubs", True, textbox.color1)
+        club_text_rect = club_text.get_rect()
+        club_text_rect.center = (pos_club[0] + club.get_width()//2, pos_club[1] + spade.get_height() + padding)
+        screen.blit(club, pos_club)
+        screen.blit(club_text, club_text_rect)
+        diamond = pygame.image.load('assets/diamonds-A.png')
+        pos_diamond = (20*padding + 3*heart.get_width() ,Y//2)
+        diamond_text = textbox_font.render("Diamonds", True, textbox.color1)
+        diamond_text_rect = diamond_text.get_rect()
+        diamond_text_rect.center = (pos_diamond[0] + club.get_width()//2, pos_diamond[1] + spade.get_height() + padding)
+        screen.blit(diamond, pos_diamond)
+        screen.blit(diamond_text, diamond_text_rect)
+        screen.blit(spade, pos_spade)
+        screen.blit(spade_text, spade_text_rect)
+
         screen.blit(text, text_rect)
+
+    elif stage[1] == 1:
+        text = text_font.render("What is a pure sequence?", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//8)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("A pure sequence consists of 3 or 4 cards of same suit in a consecutive order.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//4)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("For example :", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, 3*Y//8)
+        screen.blit(text,text_rect)
+        heartA = pygame.image.load('assets/hearts-A.png')
+        pos_heartA = (12*padding + 2* heartA.get_width(), Y//2)
+        heartK = pygame.image.load('assets/hearts-K.png')
+        pos_heartK = (11*padding + heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/hearts-Q.png')
+        pos_heartQ = (10*padding, Y//2)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heartQ, pos_heartQ)
+        heart6 = pygame.image.load('assets/hearts-6.png')
+        pos_heart6 = (X - 7*padding , Y//2)
+        heartA = pygame.image.load('assets/hearts-5.png')
+        pos_heartA = (X - 8*padding - heartA.get_width(), Y//2)
+        heartK = pygame.image.load('assets/hearts-4.png')
+        pos_heartK = (X - 9*padding - 2*heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/hearts-3.png')
+        pos_heartQ = (X - 10*padding - 3* heartA.get_width(), Y//2)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heart6, pos_heart6)
+        screen.blit(heartQ, pos_heartQ)
+
+    elif stage[1] == 2:
+        text = text_font.render("What is an impure sequence?", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//8)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("An impure sequence can substitute a joker for a missing card.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//4)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("For example :", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, 3*Y//8)
+        screen.blit(text,text_rect)
+        heartA = pygame.image.load('assets/hearts-A.png')
+        pos_heartA = (12*padding + 2* heartA.get_width(), Y//2)
+        heartK = pygame.image.load('assets/hearts-K.png')
+        pos_heartK = (11*padding + heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/spades-3.png')
+        pos_heartQ = (10*padding, Y//2)
+        heart_text = textbox_font.render("Joker", True, textbox.color1)
+        heart_text_rect = heart_text.get_rect()
+        heart_text_rect.center = (pos_heartQ[0] + heartA.get_width()//2, pos_heartQ[1] + heartA.get_height() + padding)
+        screen.blit(heart_text, heart_text_rect)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heartQ, pos_heartQ)
+        heart6 = pygame.image.load('assets/hearts-6.png')
+        pos_heart6 = (X - 7*padding , Y//2)
+        heartA = pygame.image.load('assets/diamonds-10.png')
+        pos_heartA = (X - 8*padding - heartA.get_width(), Y//2)
+        heart_text_rect.center = (pos_heartA[0] + heartA.get_width()//2, pos_heartA[1] + heartA.get_height() + padding)
+        heartK = pygame.image.load('assets/hearts-4.png')
+        pos_heartK = (X - 9*padding - 2*heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/hearts-3.png')
+        pos_heartQ = (X - 10*padding - 3* heartA.get_width(), Y//2)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heart_text, heart_text_rect)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heart6, pos_heart6)
+        screen.blit(heartQ, pos_heartQ)
+
+    elif stage[1] == 3:
+        text = text_font.render("What is a set?", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//8)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("A set consists of 3 cards of same rank but of different suits.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//4)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("For example :", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, 3*Y//8)
+        screen.blit(text,text_rect)
+        heartA = pygame.image.load('assets/hearts-5.png')
+        pos_heartA = (12*padding + 2* heartA.get_width(), Y//2)
+        heartK = pygame.image.load('assets/diamonds-10.png')
+        pos_heartK = (11*padding + heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/spades-5.png')
+        pos_heartQ = (10*padding, Y//2)
+        heart_text = textbox_font.render("Joker", True, textbox.color1)
+        heart_text_rect = heart_text.get_rect()
+        heart_text_rect.center = (pos_heartK[0] + heartA.get_width()//2, pos_heartK[1] + heartA.get_height() + padding)
+        screen.blit(heart_text, heart_text_rect)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heartQ, pos_heartQ)
+        heartA = pygame.image.load('assets/diamonds-10.png')
+        pos_heartA = (X - 8*padding - heartA.get_width(), Y//2)
+        heartK = pygame.image.load('assets/hearts-10.png')
+        pos_heartK = (X - 9*padding - 2*heartA.get_width(), Y//2)
+        heartQ = pygame.image.load('assets/spades-10.png')
+        pos_heartQ = (X - 10*padding - 3* heartA.get_width(), Y//2)
+        screen.blit(heartA, pos_heartA)
+        screen.blit(heartK, pos_heartK)
+        screen.blit(heartQ, pos_heartQ)
+
+    elif stage[1] == 4:
+        text = text_font.render("Rules : ", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//8)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("1. Each player will be dealt 13 cards.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, Y//4)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("2. A valid declare consists of :", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, 3*Y//8)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("a) A pure sequence", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + 5*padding, 7*Y//16)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("b) A sequence of 4 cards", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + 5*padding, 8*Y//16)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("c) The rest of the cards must form sets or sequences", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + 5*padding, 9*Y//16)
+        screen.blit(text,text_rect)
+        text = textbox_font.render("3. A card declared as a joker must not be used as a pure card.", True, textbox.color1)
+        text_rect = text.get_rect()
+        text_rect.center = (text_rect.width//2 + padding, 11*Y//16)
+        screen.blit(text,text_rect)
+
+    elif stage[1] == 5:
+        show_game(screen, user, deck)
+
+        if declare.is_hover:
+            text = small_font.render("You can click the declare button when ", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("your cards are a valid declare. Click the", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("declare button to finish and win the round.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+
+        if swap.is_hover:
+            text = small_font.render("To swap two cards click on the ", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("swap button then click on both", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("the cards that are to be swapped.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+
+        if discard.is_hover:
+            text = small_font.render("To discard a card click on the discard", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("button and then click on the card", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("to be discarded. Note: You must have", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("14 cards in your hand to discard a card.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 70)
+            screen.blit(text,text_rect)
+
+        if insert.is_hover:
+            text = small_font.render("To reposition a card in the hand, click", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 70)
+            screen.blit(text,text_rect)
+            text = small_font.render("on the insert button. Click on the card", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("that is to be inserted at a different place", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("and then click on the card that is to", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("be present before the inserted card.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 70)
+            screen.blit(text,text_rect)
+
+        if sort.is_hover:
+            text = small_font.render("Sort button sortes the hand according to", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("suites and ranks. Added to ease the", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("arrangement of cards.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+
+        if len(deck.pile) > 0 and deck.pile[0].is_hover:
+            text = small_font.render("To take the card on top of the pile,", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("click on the pile card.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+
+        if draw.is_hover:
+            text = small_font.render("To draw a card from the deck then", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 - 35)
+            screen.blit(text,text_rect)
+            text = small_font.render("click on the card that is facing ", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4)
+            screen.blit(text,text_rect)
+            text = small_font.render("backwards in the middle of the game.", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
+            screen.blit(text,text_rect)
+
+
     pass
 
 def tutorial_check(mouse_pos, event):
     global stage
+    if stage[1] == 5:
+        player_turn(mouse_pos, event)
     if stage[1] != last_stage:
         next.check(mouse_pos, event)
         skip.check(mouse_pos, event)
@@ -505,12 +789,12 @@ def tutorial_check(mouse_pos, event):
 # winner = user
 # deal_mode = True
 # deal = 3
-# winning_hand = [True,[user.hand]]
+winning_hand = [True,[user.hand]]
 # round_over()
 # computer = Player("ds", 0, test_hand)
 # computer_turn()
 ##########################
-before_game_reset()
+# before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
@@ -591,13 +875,13 @@ while running:
                 deal_3.check(button_parameter[0], button_parameter[1])
                 deal_5.check(button_parameter[0], button_parameter[1])
                 if deal_1.is_clicked:
-                    deals = 1
+                    deal = 1
                     stage[0] += 1
                 if deal_3.is_clicked:
-                    deals = 3
+                    deal = 3
                     stage[0] += 1
                 if deal_5.is_clicked:
-                    deals = 5
+                    deal = 5
                     stage[0] += 1
 
         elif stage[0] == 2:
