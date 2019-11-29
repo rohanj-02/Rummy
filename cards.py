@@ -454,7 +454,7 @@ class Player():
         Object Methods:
             discard_card(card) : discards card from player's hand
             deal_card(deck): Deals the player 13 cards from deck
-            shut_game():
+            declare_game():
     """
 
     def __init__(self, name, score = 0, hand = []):
@@ -484,7 +484,7 @@ class Player():
             for i in range(len(self.hand)):
                 if self.hand[i].suit == card.suit and self.hand[i].rank == card.rank and self.hand[i].isjoker == card.isjoker:
                     c = self.hand.pop(i)
-                    print(c)
+                    # print(c)
                     return None
         return None
 
@@ -548,10 +548,10 @@ class Player():
                                     self.allPossible[set_tuple] = 'none'
         pass
 
-    def shut_game(self):
+    def declare_game(self):
         """
-            Shut the game by player.
-            Returns True if player can shut the round. Else False
+            declare the game by player.
+            Returns True if player can declare the round. Else False
         """
         pure_four = []
         pure_three = []
@@ -696,9 +696,9 @@ class Player():
 # player1 = Player('Rohan', 0 ,test_hand)
 # player1.hand = sort_hand(player1.hand)
 # print(player1)
-# shut = player1.shut_game()
-# if shut[0]:
-#     for i in shut[1]:
+# declare = player1.declare_game()
+# if declare[0]:
+#     for i in declare[1]:
 #         print(list(map(str, i)))
 # else:
 #     print(False)
@@ -709,9 +709,9 @@ class Player():
 # player1.draw_card(Card('J', 'hearts',True))
 # player1.draw_card(Card('2', 'hearts',True))
 # print(player1)
-# shut = player1.shut_game()
-# if shut[0]:
-#     for i in shut[1]:
+# declare = player1.declare_game()
+# if declare[0]:
+#     for i in declare[1]:
 #         print(list(map(str, i)))
 # else:
 #     print(False)

@@ -14,13 +14,18 @@ screen = pygame.display.set_mode((X,Y))
 pygame.display.set_caption('Rummy')
 icon = pygame.image.load('assets/icon.png')
 pygame.display.set_icon(icon)
+deal_card_sound = pygame.mixer.Sound("assets/dealcard.wav")
+correct_declare = pygame.mixer.Sound("assets/correctdeclare.wav")
+# sound.play()
+wrong_declare = pygame.mixer.Sound("assets/wrongdeclare.wav")
 #
-#Stage 0 : Start
-#Stage 1 : Take name
-#Stage 2 : Points or Deal
-#Stage 3 : Number of points or number of deals
-#Stage 4 : Game
-#Stage 5 : Score Display and winner declared
+# Stage 0 : Start
+# Stage 1 : Take name
+# Stage 2 : Points or Deal
+# Stage 3 : Number of points or number of deals
+# Stage 4 : Game
+# Stage 5 : Score Display and winner declared
+# Stage 6 : Instructions
 #
 #GLOBAL VARIABLES
 
@@ -84,19 +89,19 @@ draw = Card('A', 'spades')
 swap = Button("Swap", (3*X//4 + 140, 3*Y//4 + 140), 120, 50, "Montserrat-Regular.ttf")
 insert = Button("Insert", (3*X//4 + 140, 3*Y//4), 120, 50, "Montserrat-Regular.ttf")
 sort = Button("Sort",(3*X//4, 3*Y//4), 120, 50, "Montserrat-Regular.ttf")
-shut = Button("Shut",(3*X//4, 3*Y//4 + 70), 120, 50, "Montserrat-Regular.ttf")
+declare = Button("Declare",(3*X//4, 3*Y//4 + 70), 120, 50, "Montserrat-Regular.ttf")
 discard = Button("Discard",(3*X//4 + 140, 3*Y//4 + 70 ), 120, 50, "Montserrat-Regular.ttf")
 showCP = Button("Show Computer", (3*X//4, Y//2), 260, 50, "Montserrat-Regular.ttf")
-user_name = text_font.render(user.name, True, textbox.color2)
+user_name = text_font.render(user.name, True, textbox.color1)
 user_name_rect = user_name.get_rect()
 user_name_rect.center = (3*X//4, Y//5)
-computer_name = text_font.render(computer.name, True, textbox.color2)
+computer_name = text_font.render(computer.name, True, textbox.color1)
 computer_name_rect = computer_name.get_rect()
 computer_name_rect.center = (3*X//4 , Y//5 + 70)
-name_text = text_font.render("Name", True, textbox.color2)
+name_text = text_font.render("Name", True, textbox.color1)
 name_rect = name_text.get_rect()
 name_rect.center = (3*X//4, Y//5 - 70)
-score_text = text_font.render("Score", True, textbox.color2)
+score_text = text_font.render("Score", True, textbox.color1)
 score_rect = score_text.get_rect()
 score_rect.center = (3*X//4 + 200, Y//5 - 70)
 user.turn = True
@@ -106,6 +111,7 @@ insert_mode = False
 index = []
 time = 0
 computer_delay = 2
+print_no_declare = False
 #Stage 5 :
 winning_hand = 0
 winner = False
@@ -118,10 +124,10 @@ game_over = False
 
 def show_game(screen, player, deck):
     #Show scores:
-    user_score = text_font.render(str(user.score), True, textbox.color2)
+    user_score = text_font.render(str(user.score), True, textbox.color1)
     user_score_rect = user_score.get_rect()
     user_score_rect.center = (3*X//4 + 200, Y//5)
-    computer_score = text_font.render(str(computer.score), True, textbox.color2)
+    computer_score = text_font.render(str(computer.score), True, textbox.color1)
     computer_score_rect = computer_score.get_rect()
     computer_score_rect.center = (3*X//4 + 200, Y//5 + 70)
     screen.blit(computer_score, computer_score_rect)
@@ -182,28 +188,30 @@ def show_game(screen, player, deck):
     screen.blit(back, pos)
     #show buttons
     sort.display(screen)
-    shut.display(screen)
+    declare.display(screen)
     discard.display(screen)
     showCP.display(screen)
     insert.display(screen)
     swap.display(screen)
 
 def player_turn(mouse_pos, event):
-    global discard_mode, swap_mode, index, insert_mode, winner, winning_condition, winning_hand
+    global discard_mode, swap_mode, index, insert_mode, winner, winning_condition, winning_hand, print_no_declare
     sort.check(mouse_pos, event)
     draw.check(mouse_pos, event)
     insert.check(mouse_pos,event)
-    shut.check(mouse_pos, event)
+    declare.check(mouse_pos, event)
     swap.check(mouse_pos, event)
     discard.check(mouse_pos, event)
     for i in range(len(deck.pile)):
         deck.pile[i].check(mouse_pos,event)
+
     for i in range(len(user.hand)):
         user.hand[i].check(mouse_pos, event)
 
     if len(deck.pile) != 0 :
         if deck.pile[0].is_clicked and len(user.hand) == 13:
                 user.draw_card(deck.pile.pop(0))
+                deal_card_sound.play()
     i = 0
     while i < len(user.hand):
         if user.hand[i].is_clicked and discard_mode and len(user.hand) == 14:
@@ -211,6 +219,7 @@ def player_turn(mouse_pos, event):
             computer.turn = True
             deck.update_pile(Card(user.hand[i].rank, user.hand[i].suit, user.hand[i].isjoker))
             user.discard_card(user.hand[i])
+            deal_card_sound.play()
             i -= 1
             discard_mode = False
         if user.hand[i].is_clicked and swap_mode :
@@ -237,16 +246,19 @@ def player_turn(mouse_pos, event):
     if sort.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) :
         user.hand = sort_hand(user.hand)
     if (draw.is_clicked or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE)) and len(user.hand) == 13:
+        deal_card_sound.play()
         user.draw_card(deck.draw_card())
-    if shut.is_clicked:
-        winning_hand = user.shut_game()
+    if declare.is_clicked:
+        winning_hand = user.declare_game()
         if winning_hand[0] :
             winner = user
+            correct_declare.play()
             # winning_condition = True
             round_over()
             stage[0] += 1
         else:
-            print("False")
+            wrong_declare.play()
+            print_no_declare = True
     if (discard.is_clicked or discard_mode or (event.type == pygame.KEYDOWN and event.key == pygame.K_d)) and len(user.hand) == 14:
         discard_mode = True
         swap_mode = False
@@ -256,7 +268,7 @@ def player_turn(mouse_pos, event):
 def computer_turn():
     global winner, winning_hand, time
     computer.draw_card(deck.pile[0])
-    winning_hand = computer.shut_game()
+    winning_hand = computer.declare_game()
     if winning_hand[0]:
         #winning condition
         winner = computer
@@ -295,12 +307,14 @@ def computer_turn():
         #draw from pile
         if time == 0 :
             computer.draw_card(deck.pile.pop(0))
+            deal_card_sound.play()
             time += 1
             # print("pile initialisation")
         elif time >= computer_delay:
         #DELAY
             deck.update_pile(computer.hand[min_pile[0]])
             computer.discard_card(computer.hand[min_pile[0]])
+            deal_card_sound.play()
             # print("pile time condition")
             computer.hand = sort_hand(computer.hand)
             computer.turn = False
@@ -314,11 +328,12 @@ def computer_turn():
         #DELAY
         if time == 0:
             computer.draw_card(deck.draw_card())
+            deal_card_sound.play()
             # print("deck initialisation")
             time += 1
         elif time >= computer_delay:
             # print("Deck time condition")
-            winning_hand = computer.shut_hand()
+            winning_hand = computer.declare_hand()
             if winning_hand[0] :
                 #winning condition
                 winner = computer
@@ -339,6 +354,7 @@ def computer_turn():
                 deck.update_pile(computer.hand[min_deck[0]])
                 computer.discard_card(computer.hand[min_deck[0]])
                 time = 0
+                deal_card_sound.play()
                 computer.hand = sort_hand(computer.hand)
                 computer.turn = False
                 user.turn = True
@@ -402,7 +418,7 @@ def round_over_event(mouse_pos, event):
         stage[0] = 0
 
 def game_reset():
-    global deck, user, computer, draw, swap, insert, sort, shut, discard, showCP, user_name, user_name_rect, computer_name, computer_name_rect
+    global deck, user, computer, draw, swap, insert, sort, declare, discard, showCP, user_name, user_name_rect, computer_name, computer_name_rect
     global name_text, name_rect, score_text, score_rect, discard_mode, swap_mode, insert_mode, index
     deck = Deck(2)
     deck.shuffle_cards()
@@ -440,7 +456,7 @@ def before_game_reset():
 #
 # winner = user
 # deal_mode = True
-# deal = 1
+# deal = 3
 # winning_hand = [True,[user.hand]]
 # round_over()
 # computer = Player("ds", 0, test_hand)
@@ -461,9 +477,9 @@ while running:
 
     elif stage[0] == 2:
         # display_testbox(rounds, screen)
-        print(name.text)
+        # print(name.text)
         user.name = name.text
-        user_name = text_font.render(user.name, True, textbox.color2)
+        user_name = text_font.render(user.name, True, textbox.color1)
         user_name_rect = user_name.get_rect()
         user_name_rect.center = (3*X//4, Y//5)
         points_rummy.display(screen)
@@ -481,7 +497,16 @@ while running:
             deal_5.display(screen)
 
     elif stage[0] == 4:
-        show_game(screen, user, deck)
+        if print_no_declare:
+            text = text_font.render("You don't have a valid declare!", True, textbox.color1)
+            text_rect = text.get_rect()
+            text_rect.center = (X//2, Y//2)
+            screen.blit(text, text_rect)
+            pygame.display.update()
+            pygame.time.delay(1000)
+            print_no_declare = False
+        else:
+            show_game(screen, user, deck)
 
     elif stage[0] == 5:
         round_over_display()
