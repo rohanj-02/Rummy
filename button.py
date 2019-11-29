@@ -43,6 +43,7 @@ class Button():
 
     def check(self, mouse_pos, event):
         """
+            THe function checks whether the button was clicked or if the mouse is hovering on the button.
         """
         if mouse_pos[0] >= self.position[0] and mouse_pos[0] <= self.position[0] + self.width and mouse_pos[1] >= self.position[1] and mouse_pos[1] <= self.position[1] + self.height:
             self.is_hover = True
@@ -56,6 +57,9 @@ class Button():
             self.is_hover = False
 
     def display(self, screen):
+        """
+            Displays the button on the screen according to its position and the action on the button.
+        """
         if self.is_hover :
             pygame.draw.rect(screen, self.hover_color , (self.position[0], self.position[1], self.width, self.height))
         elif self.is_clicked :
@@ -65,87 +69,8 @@ class Button():
         screen.blit(self.title_img, self.title_img_rect)
 
     def set_center(self, pos):
+        """
+            Sets the center for the button to the given parameters.
+        """
         self.title_img_rect.center = pos
         self.position = (pos[0] - self.width // 2, pos[1] - self.height // 2)
-
-
-# def max_matched(self):
-#     self.fill_all_possible()
-#     max = []
-#     max_elem = 0
-#     max_pure = False
-#     max_four = False
-#     new_four = False
-#     new_pure = False
-#     new = []
-#     new_elem = 0
-#     for i in allPossible.keys():
-#         new = i
-#         if allPossible[i] == "four":
-#             new_four = True
-#         if allPossible[i] == "pure":
-#             new_pure = True
-#         new_elem = len(i)
-#         for j in allPossible.keys():
-#             new_j = new
-#             new_elem_j = new_elem
-#             ans = True
-#             for s in range(len(j)):
-#                 check = j[s].isIn(new)
-#                 if type(check) == type(False):
-#                     ans = False
-#             if ans:
-#                 if allPossible[j] == "four":
-#                     new_four = True
-#                 if allPossible[j] == "pure":
-#                     new_pure = True
-#                 new_j += j
-#                 new_elem_j += len(j)
-#             for k in allPossible.keys():
-#                 new_k = new_j
-#                 new_elem_k = new_elem_j
-#                 ans = True
-#                 for s in range(len(k)):
-#                     check = k[s].isIn(new)
-#                     if type(check) == type(False):
-#                         ans = False
-#                 if ans:
-#                     if allPossible[k] == "four":
-#                         new_four = True
-#                     if allPossible[k] == "pure":
-#                         new_pure = True
-#                     new_k += k
-#                     new_elem_k += len(k)
-#                 for l in allPossible.keys():
-#                     ans = True
-#                     new_l = new_k
-#                     new_elem_l = new_elem_k
-#                     for s in range(len(l)):
-#                         check = l[s].isIn(new)
-#                         if type(check) == type(False):
-#                             ans = False
-#                     if ans:
-#                         if allPossible[l] == "four":
-#                             new_four = True
-#                         if allPossible[l] == "pure":
-#                             new_pure = True
-#                         new_l += l
-#                         new_elem_l += len(l)
-#                     if max_elem < new_elem_l:
-#                         max = copy.deepcopy(new_l)
-#                         max_elem = new_elem_l
-#                         max_four = new_four
-#                         max_pure = new_pure
-#                     if max_elem == new_elem_l:
-#                         if new_four and max_four:
-#                             if new_pure and (not max_pure):
-#                                 max = copy.deepcopy(new_l)
-#                                 max_elem = new_elem_l
-#                                 max_four = new_four
-#                                 max_pure = new_pure
-#                         if new_four and (not max_four):
-#                             max = copy.deepcopy(new)
-#                             max_elem = new_elem_l
-#                             max_four = new_four
-#                             max_pure = new_pure
-#     return (max, max_elem, max_four, max_pure)

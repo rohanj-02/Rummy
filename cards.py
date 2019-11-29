@@ -161,6 +161,10 @@ def is_impure_sequence(set):
     pass
 
 def calculate_score(card, hand):
+    """
+        Calculates the score of the card in the hand. Higher the score of the card the more are the possibilities of combinations of that card.
+        Added to implement the computer logic.
+    """
 
     if card.isjoker:
         return 50
@@ -302,6 +306,9 @@ class Card():
         return str(self.suit) + "-" + str(self.rank)
 
     def isIn(self, l):
+        """
+            Returns the index at which given card is in a list. If not present it returns False
+        """
         for i in range(len(l)):
             if self.suit == l[i].suit and self.rank == l[i].rank:
                 return i
@@ -338,6 +345,7 @@ class Card():
 
     def check(self, mouse_pos, event):
         """
+            To check if the mouse is hovering on the card or clicking the card.
         """
         if mouse_pos[0] >= self.position[0] and mouse_pos[0] <= self.position[0] + self.width and mouse_pos[1] >= self.position[1] and mouse_pos[1] <= self.position[1] + self.height:
             self.is_hover = True
@@ -429,18 +437,11 @@ class Deck():
         """
             Returns the image of the card at the pile.
         """
-        # img_name = str(self.pile)
-        # img = pygame.image.load("assets/"+img_name+".png")
-        # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
-        # return img
-        #
         img_list = []
         for card in range(len(self.pile)):
             if card <= 2 :
                 img = pygame.image.load("assets/"+str(self.pile[card])+".png")
-                # img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
                 img_list.append(img)
-            # i += 1
         return img_list
 
 
@@ -647,6 +648,9 @@ class Player():
         return (False, False)
 
     def swap(self, index):
+        """
+            Swaps the cards present at the two indices.
+        """
         index.sort()
         first = self.hand.pop(index[0])
         second = self.hand.pop(index[1]-1)
@@ -654,6 +658,9 @@ class Player():
         self.hand.insert(index[1], first)
 
     def insert(self, index):
+        """
+            Pops the card present at index[0] and inserts it after index[1]
+        """
         if index[0] > index[1]:
             elem = self.hand.pop(index[0])
             self.hand.insert(index[1] + 1, elem)
@@ -679,6 +686,10 @@ class Player():
         return img_list
 
     def return_unmatched(self, matched):
+        """
+        Returns the unmatched cards of the hand if the matched cards are given.
+        Currently of no use. Earlier used to implement max_matched()
+        """
         working_hand = copy.deepcopy(self.hand)
         for i in matched:
             working_hand.pop(working_hand.index(i))
@@ -737,7 +748,7 @@ class Player():
 # # print(list(map(str, Set5)))
 
 
-test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
+# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
 # player1 = Player("Rohan", 0, test_hand)
 # player1.fill_all_possible()
 # allPossible = {}

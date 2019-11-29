@@ -59,6 +59,7 @@ small_font = pygame.font.Font(fontName, 15)
 heading = heading_font.render("Rummy", True, textbox.color2)
 heading_rect = heading.get_rect()
 heading_rect.center = [X//2, Y//4]
+back_button = Button("Back", (0,0), 100, 50, "Montserrat-Regular.ttf")
 
 #Stage 0:
 start = Button("Start", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
@@ -92,12 +93,11 @@ deal_5 = Button("5", (3*X//4 + 120, 3*Y//4 + 140), 50, 50, "Montserrat-Regular.t
 deal_5.set_center((X // 2 + 60, 5*Y // 8 + 70))
 #Stage 4 :
 deck = Deck(2)
-test_hand.pop(-1)
-user = Player("Rohan",0, test_hand)
+user = Player("Rohan")
 computer = Player("Computer")
 deck.shuffle_cards()
 deck.set_joker()
-# user.deal_cards(deck)
+user.deal_cards(deck)
 computer.deal_cards(deck)
 cardss = deck.draw_card()
 deck.update_pile(cardss)
@@ -139,6 +139,9 @@ game_over = False
 # winnning_condition = False
 
 def show_game(screen, player, deck):
+    """
+        Shows everything to be shown on the main game screen.
+    """
     #Show scores:
     user_score = text_font.render(str(user.score), True, textbox.color1)
     user_score_rect = user_score.get_rect()
@@ -211,6 +214,9 @@ def show_game(screen, player, deck):
     swap.display(screen)
 
 def player_turn(mouse_pos, event):
+    """
+        Function to take mouse input and similarly check for buttons etc. in one frame of the game.
+    """
     global discard_mode, swap_mode, index, insert_mode, winner, winning_condition, winning_hand, print_no_declare
     sort.check(mouse_pos, event)
     draw.check(mouse_pos, event)
@@ -282,6 +288,9 @@ def player_turn(mouse_pos, event):
     pygame.display.update()
 
 def computer_turn():
+    """
+        Function to implement the moves of the computer
+    """
     global winner, winning_hand, time
     computer.draw_card(deck.pile[0])
     winning_hand = computer.declare_game()
@@ -379,6 +388,9 @@ def computer_turn():
             time += 1
 
 def round_over():
+    """
+        Function to realise that the round is over. Takes care of score.
+    """
     #print winner won this round
     #show their hand
     #show next round button
@@ -409,6 +421,9 @@ def round_over():
     play_again = Button("Play Again", (X - 2*padding - 200, Y - 125), 200, 50, "Montserrat-Regular.ttf")
 
 def round_over_display():
+    """
+        To display the screen after the round is over.
+    """
     global winner_text, winner_text_rect, winning_hand, game_over, new_round,stage
     screen.blit(winner_text, winner_text_rect)
     i = 0
@@ -424,6 +439,9 @@ def round_over_display():
         play_again.display(screen)
 
 def round_over_event(mouse_pos, event):
+    """
+        To take mouse input for buttons etc. to go to the next round.
+    """
     new_round.check(mouse_pos, event)
     play_again.check(mouse_pos, event)
     if new_round.is_clicked and deal > 0:
@@ -434,6 +452,9 @@ def round_over_event(mouse_pos, event):
         stage[0] = 0
 
 def game_reset():
+    """
+        Rests all the variables to initialise a round.
+    """
     global deck, user, computer, draw, swap, insert, sort, declare, discard, showCP, user_name, user_name_rect, computer_name, computer_name_rect
     global name_text, name_rect, score_text, score_rect, discard_mode, swap_mode, insert_mode, index
     deck = Deck(2)
@@ -450,6 +471,9 @@ def game_reset():
     index = []
 
 def winning_reset():
+    """
+        Resets all the variables to initialise another game.
+    """
     global winning_hand, winner, winner_text, winner_text_rect, new_round, play_again, game_over
     winning_hand = 0
     winner = False
@@ -460,6 +484,9 @@ def winning_reset():
     game_over = False
 
 def before_game_reset():
+    """
+        Resets everything to default value.
+    """
     global start, name, points_rummy, deal_rummy, points_text ,points_text_rect, deal_text, deal_text_rect, points_100, points_200
     global deal_1, deal_3, deal_5, winning_hand, winner, winner_text, winner_text_rect, new_round, play_again, game_over
     #Stage 1 :
@@ -469,6 +496,9 @@ def before_game_reset():
     winning_reset()
 
 def tutorial_show():
+    """
+        The display of all the stages in the tutorial of the game.
+    """
     global stage
     #Add code to display how to play above. looks weird right now
     if stage[1] != last_stage:
@@ -766,6 +796,9 @@ def tutorial_show():
     pass
 
 def tutorial_check(mouse_pos, event):
+    """
+        To take mouse input for buttons etc. in the tutorial.
+    """
     global stage
     if stage[1] == 5:
         player_turn(mouse_pos, event)
@@ -789,7 +822,7 @@ def tutorial_check(mouse_pos, event):
 # winner = user
 # deal_mode = True
 # deal = 3
-winning_hand = [True,[user.hand]]
+# winning_hand = [True,[user.hand]]
 # round_over()
 # computer = Player("ds", 0, test_hand)
 # computer_turn()
@@ -798,6 +831,8 @@ winning_hand = [True,[user.hand]]
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
+    if stage[0] != 0 and stage[0] != 4:
+        back_button.display(screen)
     if stage[0] == -1:
         tutorial_show()
 
@@ -849,6 +884,16 @@ while running:
 
     for event in pygame.event.get():
         button_parameter = (pygame.mouse.get_pos(), event)
+        back_button.check(button_parameter[0], button_parameter[1])
+        if back_button.is_clicked :
+            if stage[0] > 0:
+                stage[0] -= 1
+            elif stage[0] == -1:
+                if stage[1] > 0:
+                    stage[1] -= 1
+                else:
+                    stage[1] = 0
+                    stage[0] = 0
 
         if stage[0] == 5:
             round_over_event(button_parameter[0], button_parameter[1])
