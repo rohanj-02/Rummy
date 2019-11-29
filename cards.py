@@ -242,10 +242,10 @@ def calculate_score(card, hand):
     list_cards = []
     for i in range(-2,3):
         if i != 0 :
-            if int(card.rank_val) + i <= 10:
-                list_cards.append(Card(str(int(card.rank_val) + i), card.suit, card.isjoker))
-            elif int(card.rank_val) + i == 1:
+            if int(card.rank_val) + i == 1:
                 list_cards.append(Card('A', card.suit, card.isjoker))
+            elif int(card.rank_val) + i <= 10:
+                list_cards.append(Card(str(int(card.rank_val) + i), card.suit, card.isjoker))
             elif int(card.rank_val) + i == 11:
                 list_cards.append(Card('J', card.suit, card.isjoker))
             elif int(card.rank_val) + i == 12:
@@ -283,7 +283,7 @@ class Card():
     def __init__(self, card_rank, card_suit, isjoker = False):
         self.position = (0,0)
         img = pygame.image.load('assets/back.png')
-        img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
+        # img = pygame.transform.scale(img, (img.get_width()//4, img.get_height()//4))
         self.is_hover = False
         self.is_clicked = False
         self.width = img.get_width()
@@ -333,7 +333,7 @@ class Card():
         """
         img_name = str(self)
         card_img = pygame.image.load("assets/"+img_name+".png")
-        card_img = pygame.transform.scale(card_img, (card_img.get_width()//4, card_img.get_height()//4))
+        # card_img = pygame.transform.scale(card_img, (card_img.get_width()//4, card_img.get_height()//4))
         return card_img
 
     def check(self, mouse_pos, event):
@@ -435,7 +435,7 @@ class Deck():
         for card in range(len(self.pile)):
             if card <= 2 :
                 img = pygame.image.load("assets/"+str(self.pile[card])+".png")
-                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+                # img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
                 img_list.append(img)
             # i += 1
         return img_list
@@ -667,10 +667,10 @@ class Player():
             img = pygame.image.load("assets/"+str(card)+".png")
             if card.is_hover == True:
                 card.offset = -10
-                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+                # img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
             else:
                 card.offset = 0
-                img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+                # img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
             img_list.append(img)
             # i += 1
         return img_list
@@ -682,91 +682,6 @@ class Player():
         working_hand = sort_hand(working_hand)
         return working_hand[-1]
 
-    def max_matched(self):
-        self.fill_all_possible()
-        allPossible = {}
-        acceptable = ["pure","impure","set"]
-        for k,v in self.allPossible.items():
-            if v in acceptable:
-                allPossible[k] = v
-        max = []
-        max_elem = 0
-        max_pure = False
-        max_four = False
-        new_four = False
-        new_pure = False
-        new = []
-        new_elem = 0
-        for i in allPossible.keys():
-            new = i
-            if len(allPossible[i]) == 4:
-                new_four = True
-            if allPossible[i] == "pure":
-                new_pure = True
-            new_elem = len(i)
-            for j in allPossible.keys():
-                new_j = copy.deepcopy(new)
-                new_elem_j = new_elem
-                ans = False
-                for s in range(len(j)):
-                    check = j[s].isIn(new_j)
-                    if type(check) != type(False):
-                        ans = True
-                if not ans:
-                    if len(allPossible[j]) == 4:
-                        new_four = True
-                    if allPossible[j] == "pure":
-                        new_pure = True
-                    new_j += j
-                    new_elem_j += len(j)
-                for k in allPossible.keys():
-                    new_k = copy.deepcopy(new_j)
-                    new_elem_k = new_elem_j
-                    ans = False
-                    for s in range(len(k)):
-                        check = k[s].isIn(new_k)
-                        if type(check) != type(False):
-                            ans = True
-                    if not ans:
-                        if len(allPossible[k]) == 4:
-                            new_four = True
-                        if allPossible[k] == "pure":
-                            new_pure = True
-                        new_k += k
-                        new_elem_k += len(k)
-                    for l in allPossible.keys():
-                        ans = False
-                        new_l = copy.deepcopy(new_k)
-                        new_elem_l = new_elem_k
-                        for s in range(len(l)):
-                            check = l[s].isIn(new_l)
-                            if type(check) != type(False):
-                                ans = True
-                        if not ans:
-                            if len(allPossible[l]) == 4:
-                                new_four = True
-                            if allPossible[l] == "pure":
-                                new_pure = True
-                            new_l += l
-                            new_elem_l += len(l)
-                        if max_elem < new_elem_l:
-                            max = copy.deepcopy(new_l)
-                            max_elem = new_elem_l
-                            max_four = new_four
-                            max_pure = new_pure
-                        if max_elem == new_elem_l:
-                            if new_four and max_four:
-                                if new_pure and (not max_pure):
-                                    max = copy.deepcopy(new_l)
-                                    max_elem = new_elem_l
-                                    max_four = new_four
-                                    max_pure = new_pure
-                            if new_four and (not max_four):
-                                max = copy.deepcopy(new)
-                                max_elem = new_elem_l
-                                max_four = new_four
-                                max_pure = new_pure
-        return (max, max_elem, max_four, max_pure)
 
 
 # full_deck = Deck(2)

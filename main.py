@@ -24,7 +24,7 @@ pygame.display.set_icon(icon)
 #
 #GLOBAL VARIABLES
 
-stage = [4]
+stage = [0]
 fontName = "centuryGothic.ttf"
 running = True
 black = [0,0,0]
@@ -104,6 +104,8 @@ discard_mode = False
 swap_mode = False
 insert_mode = False
 index = []
+time = 0
+computer_delay = 2
 #Stage 5 :
 winning_hand = 0
 winner = False
@@ -133,7 +135,7 @@ def show_game(screen, player, deck):
     count = 0
     #Show Player Cards
     back = pygame.image.load('assets/back.png')
-    back = pygame.transform.scale(back, (back.get_width()//4,back.get_height()//4))
+    # back = pygame.transform.scale(back, (back.get_width()//4,back.get_height()//4))
     for i in images:
         if count < 7:
             pos = (count*(back.get_width() + card_gap)+ padding ,Y - 2*back.get_height() - padding- card_gap + player.hand[count].offset)
@@ -252,45 +254,7 @@ def player_turn(mouse_pos, event):
     pygame.display.update()
 
 def computer_turn():
-    global winner, winning_hand
-    # computer.draw_card(deck.draw_card())
-    # computer.hand = sort_hand(computer.hand)
-    # deck.update_pile(Card(computer.hand[-1].rank, computer.hand[-1].suit, computer.hand[-1].isjoker))
-    # computer.discard_card(computer.hand[-1])
-    # computer.fill_all_possible()
-    # max_normal = computer.max_matched()
-    # new_card = copy.deepcopy(deck.pile[0])
-    # random_joker = Card("J","spades", True)
-    # computer.hand.append(new_card)
-    # max_after_pile = computer.max_matched()
-    # computer.hand.pop(computer.hand.index(new_card))
-    # computer.hand.append(random_joker)
-    # max_after_joker = computer.max_matched()
-    # computer.hand.pop(computer.hand.index(random_joker))
-    # if len(max_normal[0]) == len(max_after_joker[0]) == len(max_after_pile[0]):
-    #     computer.draw_card(deck)
-    #     card = computer.return_unmatched(max_after_joker[0])
-    #     computer.discard_card(card)
-    #     deck.update_pile(card)
-    # if len(max_after_joker[0]) > len(max_after_pile):
-    #     computer.draw_card(deck.draw_card())
-    #     card = computer.return_unmatched(max_after_joker[0])
-    #     computer.discard_card(card)
-    #     deck.update.pile(card)
-    # elif len(max_after_joker[0]) == len(max_after_pile):
-    #     computer.draw_card(deck.pile.pop(0))
-    #     card = computer.return_unmatched(max_after_joker[0])
-    #     computer.discard_card(card)
-    #     deck.update.pile(card)
-    # see max matching right now
-    # see max matching after addition of pile card
-    # see max matching after addition of joker
-    # if max matching right now == max matching after pile == max matching after joker:
-    # draw card and then discard highest of unmatched
-    # if max matching of pile > max matching now :
-    # pick pile and then throw highest unmatched card
-    # if max matching of joker > max matching of pile
-    # draw card and then pop highest unmatched
+    global winner, winning_hand, time
     computer.draw_card(deck.pile[0])
     winning_hand = computer.shut_game()
     if winning_hand[0]:
@@ -329,34 +293,58 @@ def computer_turn():
 
     if min_pile[1] <= min_deck[1]:
         #draw from pile
-        computer.draw_card(deck.pile.pop(0))
-        #delay here
-        deck.update_pile(computer.hand[min_pile[0]])
-        computer.discard_card(computer.hand[min_pile[0]])
+        if time == 0 :
+            computer.draw_card(deck.pile.pop(0))
+            time += 1
+            # print("pile initialisation")
+        elif time >= computer_delay:
+        #DELAY
+            deck.update_pile(computer.hand[min_pile[0]])
+            computer.discard_card(computer.hand[min_pile[0]])
+            # print("pile time condition")
+            computer.hand = sort_hand(computer.hand)
+            computer.turn = False
+            user.turn = True
+            time = 0
+        else:
+            # print("pile increment")
+            time += 1
     else:
         #draw from deck
-        computer.draw_card(deck.draw_card())
-        winning_hand = computer.shut_hand()
-        if winning_hand[0] :
-            #winning condition
-            winner = computer
-            round_over()
-            stage[0] += 1
+        #DELAY
+        if time == 0:
+            computer.draw_card(deck.draw_card())
+            # print("deck initialisation")
+            time += 1
+        elif time >= computer_delay:
+            # print("Deck time condition")
+            winning_hand = computer.shut_hand()
+            if winning_hand[0] :
+                #winning condition
+                winner = computer
+                round_over()
+                stage[0] += 1
+                time = 0
+            else:
+                score = [0] * 14
+                min_deck = (0, 100)
+                for i in range(len(computer.hand)):
+                    score[i] = calculate_score(computer.hand[i], computer.hand)
+                for i in range(len(score)):
+                    if score[i] < min_deck[1]:
+                        min_deck = (i,score[i])
+                    elif score[i] == min_deck[1]:
+                        if computer.hand[i].rank >= computer.hand[min_deck[0]].rank:
+                            min_deck = (i, score[i])
+                deck.update_pile(computer.hand[min_deck[0]])
+                computer.discard_card(computer.hand[min_deck[0]])
+                time = 0
+                computer.hand = sort_hand(computer.hand)
+                computer.turn = False
+                user.turn = True
         else:
-            score = [0] * 14
-            min_deck = (0, 100)
-            for i in range(len(computer.hand)):
-                score[i] = calculate_score(computer.hand[i], computer.hand)
-            for i in range(len(score)):
-                if score[i] < min_deck[1]:
-                    min_deck = (i,score[i])
-                elif score[i] == min_deck[1]:
-                    if computer.hand[i].rank >= computer.hand[min_deck[0]].rank:
-                        min_deck = (i, score[i])
-            deck.update_pile(computer.hand[min_deck[0]])
-            computer.discard_card(computer.hand[min_deck[0]])
-    computer.turn = False
-    user.turn = True
+            # print("deck increment condition")
+            time += 1
 
 def round_over():
     #print winner won this round
@@ -394,7 +382,7 @@ def round_over_display():
     i = 0
     for card in winning_hand:
         img = pygame.image.load("assets/"+str(card)+".png")
-        img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
+        # img = pygame.transform.scale(img,(img.get_width()//4, img.get_height()//4))
         pos = (padding + i*(img.get_width() + card_gap), Y // 2)
         screen.blit(img, pos)
         i += 1
