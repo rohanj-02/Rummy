@@ -275,7 +275,7 @@ def add_points(l):
     points = 0
     for i in l:
         if type(i) == Card:
-            if i.is_joker:
+            if i.isjoker:
                 points += 0
             elif i.rank_val <= 10:
                 points += i.rank_val
@@ -712,34 +712,6 @@ class Player():
         """
             Calculates point of the player when the round has ended
         """
-        # self.fill_all_possible()
-        # working_set = {}
-        # working_hand = copy.deepcopy(self.hand)
-        # pure_condition = False
-        # four_condition = False
-        # for i,j in self.allPossible.items():
-        #     if j == 'pure':
-        #         pure_condition = True
-        #     if j != 'none':
-        #         working_set[i] = j
-        # for i in working_set.keys():
-        #     if len(i) == 4:
-        #         four_condition = True
-        # if not (four_condition and pure_condition):
-        #     return 80
-        # four_condition = False
-        # pure_condition = False
-        # for i in working_set.keys():
-        #     working_set1 = copy.deepcopy(working_set)
-        #     if len(i) == 4:
-        #         four_condition = True
-        #         if working_set[i] == "pure":
-        #             pure_condition = True
-        #
-        #         for j in working_set1.keys():
-        #             working_set2 = copy.deepcopy(working_set1)
-        #             if
-
         pure_four = []
         pure_three = []
         impure_three = []
@@ -801,8 +773,9 @@ class Player():
                                 final_hand.pop(check3)
                         if len(final_hand2) == 0:
                             extras[1] = fillers_impure_four[m]
-                    total_hand = first_life + second_life + extras
+                    total_hand = list(first_life) + list(second_life) + list(extras[0]) + list(extras[1])
                     points = add_points(self.hand) - add_points(total_hand)
+                    print("function alled")
                     if points < min_points:
                         min_points = points
                         min_hand = total_hand
@@ -823,6 +796,7 @@ class Player():
                         hand_without_runs.pop(check2)
                     else:
                         break
+                # print(first_life)
                 if len(hand_without_runs) == 6:
                     second_life = sequences_three[k]
                 for l in range(len(fillers_impure_four)):
@@ -836,18 +810,21 @@ class Player():
                         extras[0] = fillers_impure_four[l]
                         extras[1] = ''
                     for m in range(len(fillers_impure_four)):
+                        extras[1] = ''
                         final_hand2 = copy.deepcopy(final_hand)
                         for j in fillers_impure_four[m]:
-                            check3 = j.isIn(final_hand)
+                            check3 = j.isIn(final_hand2)
                             if type(check3) != type(False):
-                                final_hand.pop(check3)
+                                final_hand2.pop(check3)
                         if len(final_hand2) == 0:
                             extras[1] = fillers_impure_four[m]
-                    total_hand = first_life + second_life + extras
-                    points = add_points(self.hand) - add_points(total_hand)
-                    if points < min_points:
-                        min_points = points
-                        min_hand = total_hand
+                        total_hand = list(first_life) + list(second_life) + list(extras[0]) + list(extras[1])
+                        print(total_hand)
+                        points = add_points(self.hand) - add_points(total_hand)
+                        if points < min_points:
+                            print("function")
+                            min_points = points
+                            min_hand = total_hand
 
         min_hand2 = []
         for i in min_hand:
@@ -857,73 +834,68 @@ class Player():
         return (min_points, min_hand)
 
 
-
-# full_deck = Deck(2)
-# player1 = Player("")
-# player2 = Player("")
-# d = Deck(1)
-# player1.deal_cards(d)
-
-# print(id(player1.hand) == id(player2.hand))
-
-
-# player1 = Player('Rohan', 0 ,test_hand)
-# player1.hand = sort_hand(player1.hand)
-# print(player1)
-# declare = player1.declare_game()
-# if declare[0]:
-#     for i in declare[1]:
-#         print(list(map(str, i)))
-# else:
-#     print(False)
-# deck = Deck(2)
-# print(str(deck.draw_card()))
-# player1.discard_card(Card('10','diamonds'))
-# player1.discard_card(Card('9','diamonds'))
-# player1.draw_card(Card('J', 'hearts',True))
-# player1.draw_card(Card('2', 'hearts',True))
-# print(player1)
-# declare = player1.declare_game()
-# if declare[0]:
-#     for i in declare[1]:
-#         print(list(map(str, i)))
-# else:
-#     print(False)
-# # print(len(player1.allPossible.values()))
-#
-# player1.hand = sort_hand(player1.hand)
-#
-# #testing is sequence is set is impure sequence
-# Set1 = [Card('3', 'clubs'), Card('3', 'hearts'), Card('3', 'spades')]
-# Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
-# Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
-# Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
-# Set5 = [Card('K', 'spades'), Card('A', 'spades'), Card('Q','spades'), Card('2', 'hearts',True)]
-# Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
-# # print(is_set(Set1))
-# # print(is_set(Set4))
-# # print(is_impure_sequence(Set3))
-# # print(is_sequence(Set2), is_sequence(Set5))
-# # print(is_impure_sequence(Set5))
-# # print(list(map(str, Set5)))
-
-
-test_hand = [Card('K','hearts'),Card('7','diamonds'),Card('Q','diamonds'),Card('2','spades'),Card('J','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
-player1 = Player("Rohan", 0, test_hand)
-# points = player1.calculate_points()
-print(add_points(test_hand))
-# print(points[0])
-# player1.fill_all_possible()
-# allPossible = {}
-# acceptable = ["pure","impure","set"]
-# for k,v in player1.allPossible.items():
-#     if v in acceptable:
-#         allPossible[k] = v
-# print(len(allPossible.keys()))
-# print(len(player1.allPossible.keys()))
-# max = player1.max_matched()
-# for i in max[0]:
-#     print(str(i))
-# for i in max:
-#     if type(i) != tuple:
-#         print(i)
+if __name__ == "__main__":
+    # full_deck = Deck(2)
+    # player1 = Player("")
+    # player2 = Player("")
+    # d = Deck(1)
+    # player1.deal_cards(d)
+    # print(id(player1.hand) == id(player2.hand))
+    # player1 = Player('Rohan', 0 ,test_hand)
+    # player1.hand = sort_hand(player1.hand)
+    # print(player1)
+    # declare = player1.declare_game()
+    # if declare[0]:
+    #     for i in declare[1]:
+    #         print(list(map(str, i)))
+    # else:
+    #     print(False)
+    # deck = Deck(2)
+    # print(str(deck.draw_card()))
+    # player1.discard_card(Card('10','diamonds'))
+    # player1.discard_card(Card('9','diamonds'))
+    # player1.draw_card(Card('J', 'hearts',True))
+    # player1.draw_card(Card('2', 'hearts',True))
+    # print(player1)
+    # declare = player1.declare_game()
+    # if declare[0]:
+    #     for i in declare[1]:
+    #         print(list(map(str, i)))
+    # else:
+    #     print(False)
+    # # print(len(player1.allPossible.values()))
+    #
+    # player1.hand = sort_hand(player1.hand)
+    #
+    # #testing is sequence is set is impure sequence
+    # Set1 = [Card('3', 'clubs'), Card('3', 'hearts'), Card('3', 'spades')]
+    # Set2 = [Card('J', 'spades'), Card('Q', 'hearts'), Card('K', 'clubs')]
+    # Set3 = [Card('2', 'hearts', True), Card('8', 'spades'), Card('10','spades'), Card('9', 'spades')]
+    # Set4 = [Card('J', 'spades'), Card('J', 'hearts'), Card('J', 'clubs')]
+    # Set5 = [Card('K', 'spades'), Card('A', 'spades'), Card('Q','spades'), Card('2', 'hearts',True)]
+    # Set6 = [Card('J', 'spades', True), Card('5', 'clubs'), Card('6', 'clubs')]
+    # # print(is_set(Set1))
+    # # print(is_set(Set4))
+    # # print(is_impure_sequence(Set3))
+    # # print(is_sequence(Set2), is_sequence(Set5))
+    # # print(is_impure_sequence(Set5))
+    # # print(list(map(str, Set5)))
+    test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('2','spades'),Card('10','diamonds'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
+    player1 = Player("Rohan", 0, test_hand)
+    points = player1.calculate_points()
+    # print(add_points(test_hand))
+    print(points[0])
+    # player1.fill_all_possible()
+    # allPossible = {}
+    # acceptable = ["pure","impure","set"]
+    # for k,v in player1.allPossible.items():
+    #     if v in acceptable:
+    #         allPossible[k] = v
+    # print(len(allPossible.keys()))
+    # print(len(player1.allPossible.keys()))
+    # max = player1.max_matched()
+    # for i in max[0]:
+    #     print(str(i))
+    # for i in max:
+    #     if type(i) != tuple:
+    #         print(i)
