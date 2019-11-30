@@ -3,6 +3,8 @@ A variation of the card game rummy using python and pygame.
 
 **Players :** User and Computer
 
+Deal Rummy is a game where there are x number of deals and the person that wins the highest amount of rounds is declared as the winner.
+
 ## Objective
 The objective of the game is to form Runs and Sets and declare your turn as soon as possible. 
 

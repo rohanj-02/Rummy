@@ -64,7 +64,7 @@ back_button = Button("Back", (0,0), 100, 50, "Montserrat-Regular.ttf")
 #Stage 0:
 start = Button("Start", (3*X//4 + 120, 3*Y//4 + 140), 200, 50, "Montserrat-Regular.ttf")
 start.set_center((X // 2, 5*Y // 8))
-how_to = Button("How To Play?",(0,0), 200, 50, "Montserrat-Regular.ttf")
+how_to = Button("How To Play",(0,0), 200, 50, "Montserrat-Regular.ttf")
 how_to.set_center((X//2, 5*Y//8 + start.height + padding))
 #Stage 1 :
 name = TextBox("Enter Name")
@@ -201,6 +201,16 @@ def show_game(screen, player, deck):
     joker_rect = joker.get_rect()
     joker_rect.center = [8*(back.get_width() + card_gap) + back.get_width()//2 + padding ,3*(back.get_height() + card_gap + padding)]
     screen.blit(joker, joker_rect)
+    if stage[0] == -1:
+        d = joker_font.render("Deck", True, black)
+        d_rect = d.get_rect()
+        d_rect.center = (7*(back.get_width() + card_gap) + back.get_width()//2 + padding, 3*(back.get_height() + card_gap + padding))
+        screen.blit(d, d_rect)
+        d = joker_font.render("Pile", True, black)
+        d_rect = d.get_rect()
+        d_rect.center = (5*padding + back.get_width()//2, 3*(back.get_height() + card_gap + padding) - padding)
+        screen.blit(d, d_rect)
+
     #show deck
     pos = (7*(back.get_width() + card_gap) + padding ,2*(back.get_height() + card_gap + padding))
     draw.position = pos
@@ -678,10 +688,10 @@ def tutorial_show():
         text_rect = text.get_rect()
         text_rect.center = (text_rect.width//2 + 5*padding, 9*Y//16)
         screen.blit(text,text_rect)
-        text = textbox_font.render("3. A card declared as a joker must not be used as a pure card.", True, textbox.color1)
-        text_rect = text.get_rect()
-        text_rect.center = (text_rect.width//2 + padding, 11*Y//16)
-        screen.blit(text,text_rect)
+        # text = textbox_font.render("3. A card declared as a joker must not be used as a pure card.", True, textbox.color1)
+        # text_rect = text.get_rect()
+        # text_rect.center = (text_rect.width//2 + padding, 11*Y//16)
+        # screen.blit(text,text_rect)
 
     elif stage[1] == 5:
         show_game(screen, user, deck)
@@ -700,7 +710,7 @@ def tutorial_show():
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
             screen.blit(text,text_rect)
 
-        if swap.is_hover:
+        if swap.is_hover or swap_mode:
             text = small_font.render("To swap two cards click on the ", True, textbox.color1)
             text_rect = text.get_rect()
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 35)
@@ -714,7 +724,7 @@ def tutorial_show():
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 35)
             screen.blit(text,text_rect)
 
-        if discard.is_hover:
+        if discard.is_hover or discard_mode:
             text = small_font.render("To discard a card click on the discard", True, textbox.color1)
             text_rect = text.get_rect()
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 35)
@@ -732,7 +742,7 @@ def tutorial_show():
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2 , 3*Y//4 + 70)
             screen.blit(text,text_rect)
 
-        if insert.is_hover:
+        if insert.is_hover or insert_mode:
             text = small_font.render("To reposition a card in the hand, click", True, textbox.color1)
             text_rect = text.get_rect()
             text_rect.center = (8 * card_gap + 7 * card_width + padding + text.get_width()//2, 3*Y//4 - 70)
@@ -793,8 +803,6 @@ def tutorial_show():
             screen.blit(text,text_rect)
 
 
-    pass
-
 def tutorial_check(mouse_pos, event):
     """
         To take mouse input for buttons etc. in the tutorial.
@@ -827,11 +835,11 @@ def tutorial_check(mouse_pos, event):
 # computer = Player("ds", 0, test_hand)
 # computer_turn()
 ##########################
-# before_game_reset()
+before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
-    if stage[0] != 0 and stage[0] != 4:
+    if not (stage[0] == 0 or stage[0] == 4):
         back_button.display(screen)
     if stage[0] == -1:
         tutorial_show()
@@ -847,8 +855,6 @@ while running:
         display_testbox(name, screen)
 
     elif stage[0] == 2:
-        # display_testbox(rounds, screen)
-        # print(name.text)
         user.name = name.text
         user_name = text_font.render(user.name, True, textbox.color1)
         user_name_rect = user_name.get_rect()
@@ -857,6 +863,8 @@ while running:
         deal_rummy.display(screen)
 
     elif stage[0] == 3:
+        user.name = name.text
+        user_name = text_font.render(user.name, True, textbox.color1)
         if points_mode:
             screen.blit(points_text, points_text_rect)
             points_100.display(screen)
