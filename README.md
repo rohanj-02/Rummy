@@ -42,6 +42,7 @@ eg. if the card picked and kept visible is 3 hearts then all cards with rank 3 t
 ## Scoring
 The player who declares first wins the round. The player to win the most number of rounds in a game wins the game.
 
+**Execute main.py to run the game.**
 
 **Rules as given in** [OctroRummy](https://rummy.octro.com/tutorial/)
 

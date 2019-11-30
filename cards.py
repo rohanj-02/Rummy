@@ -271,6 +271,18 @@ def calculate_score(card, hand):
                 score += 10
     return score
 
+def add_points(l):
+    points = 0
+    for i in l:
+        if type(i) == Card:
+            if i.is_joker:
+                points += 0
+            elif i.rank_val <= 10:
+                points += i.rank_val
+            else:
+                points += 10
+    return points
+
 
 class Card():
     """
@@ -514,8 +526,7 @@ class Player():
 
     def fill_all_possible(self):
         """
-            Returns all the occurences of sequences of size 4 (pure or impure) in the player's hand.
-            Return : A list containing all such sequences
+            Fills the allPossible attribute as a dictionary containing combination of hands and whether they form a set/ sequence or not
         """
         self.allPossible = {}
         working_hand = copy.deepcopy(self.hand)
@@ -697,6 +708,155 @@ class Player():
         return working_hand[-1]
 
 
+    def calculate_points(self):
+        """
+            Calculates point of the player when the round has ended
+        """
+        # self.fill_all_possible()
+        # working_set = {}
+        # working_hand = copy.deepcopy(self.hand)
+        # pure_condition = False
+        # four_condition = False
+        # for i,j in self.allPossible.items():
+        #     if j == 'pure':
+        #         pure_condition = True
+        #     if j != 'none':
+        #         working_set[i] = j
+        # for i in working_set.keys():
+        #     if len(i) == 4:
+        #         four_condition = True
+        # if not (four_condition and pure_condition):
+        #     return 80
+        # four_condition = False
+        # pure_condition = False
+        # for i in working_set.keys():
+        #     working_set1 = copy.deepcopy(working_set)
+        #     if len(i) == 4:
+        #         four_condition = True
+        #         if working_set[i] == "pure":
+        #             pure_condition = True
+        #
+        #         for j in working_set1.keys():
+        #             working_set2 = copy.deepcopy(working_set1)
+        #             if
+
+        pure_four = []
+        pure_three = []
+        impure_three = []
+        impure_four = []
+        set_three = []
+        min_points = 80
+        min_hand = []
+        first_life= []
+        second_life= []
+        extras = ['','']
+        self.fill_all_possible()
+        for k,v in self.allPossible.items():
+            if len(k) == 4 and v == 'pure':
+                pure_four.append(k)
+            elif len(k) == 4 and v == 'impure':
+                impure_four.append(k)
+            elif len(k) == 3 and v == 'pure':
+                pure_three.append(k)
+            elif len(k) == 3 and v == 'impure':
+                impure_three.append(k)
+            elif len(k) == 3 and v == 'set':
+                set_three.append(k)
+        fillers_impure_four = pure_three + impure_three + set_three
+        sequences_three = pure_three + impure_three
+        hand_copy = copy.deepcopy(self.hand)
+        for i in range(len(impure_four)): # if sequence of 4 is impure
+            hand_without_impure = copy.deepcopy(hand_copy)
+            for j in range(len(impure_four[i])): # to make hand without impure
+                check = impure_four[i][j].isIn(hand_without_impure)
+                if type(check) != type(False):
+                    hand_without_impure.pop(check)
+            if len(hand_without_impure) == 9:
+                first_life = impure_four[i]
+            for k in range(len(pure_three)):
+                hand_without_runs = copy.deepcopy(hand_without_impure)
+                for j in range(len(pure_three[k])): # hand_without runs =  hand - 4 impure - 3 pure
+                    check2 = pure_three[k][j].isIn(hand_without_runs)
+                    if type(check2) != type(False):
+                        hand_without_runs.pop(check2)
+                    else:
+                        break
+                if len(hand_without_runs) == 6:
+                    second_life = pure_three[k]
+                for l in range(len(fillers_impure_four)):
+                    final_hand = copy.deepcopy(hand_without_runs)
+                    extras = ['','']
+                    for j in fillers_impure_four[l]:
+                        check3 = j.isIn(final_hand)
+                        if type(check3) != type(False):
+                            final_hand.pop(check3)
+                    if len(final_hand) == 3:
+                        extras[0] = fillers_impure_four[l]
+                        extras[1] = ''
+                    for m in range(len(fillers_impure_four)):
+                        final_hand2 = copy.deepcopy(final_hand)
+                        for j in fillers_impure_four[m]:
+                            check3 = j.isIn(final_hand)
+                            if type(check3) != type(False):
+                                final_hand.pop(check3)
+                        if len(final_hand2) == 0:
+                            extras[1] = fillers_impure_four[m]
+                    total_hand = first_life + second_life + extras
+                    points = add_points(self.hand) - add_points(total_hand)
+                    if points < min_points:
+                        min_points = points
+                        min_hand = total_hand
+
+        for i in range(len(pure_four)): # if sequence of 4 is pure
+            hand_without_pure = copy.deepcopy(hand_copy)
+            for j in range(len(pure_four[i])): # to make hand without pure
+                check = pure_four[i][j].isIn(hand_without_pure)
+                if type(check) != type(False):
+                    hand_without_pure.pop(check)
+            if len(hand_without_pure) == 9:
+                first_life = pure_four[i]
+            for k in range(len(sequences_three)):
+                hand_without_runs = copy.deepcopy(hand_without_pure)
+                for j in range(len(sequences_three[k])): # hand_without runs =  hand - 4 pure
+                    check2 = sequences_three[k][j].isIn(hand_without_runs)
+                    if type(check2) != type(False):
+                        hand_without_runs.pop(check2)
+                    else:
+                        break
+                if len(hand_without_runs) == 6:
+                    second_life = sequences_three[k]
+                for l in range(len(fillers_impure_four)):
+                    final_hand = copy.deepcopy(hand_without_runs)
+                    extras = ['','']
+                    for j in fillers_impure_four[l]:
+                        check3 = j.isIn(final_hand)
+                        if type(check3) != type(False):
+                            final_hand.pop(check3)
+                    if len(final_hand) == 3:
+                        extras[0] = fillers_impure_four[l]
+                        extras[1] = ''
+                    for m in range(len(fillers_impure_four)):
+                        final_hand2 = copy.deepcopy(final_hand)
+                        for j in fillers_impure_four[m]:
+                            check3 = j.isIn(final_hand)
+                            if type(check3) != type(False):
+                                final_hand.pop(check3)
+                        if len(final_hand2) == 0:
+                            extras[1] = fillers_impure_four[m]
+                    total_hand = first_life + second_life + extras
+                    points = add_points(self.hand) - add_points(total_hand)
+                    if points < min_points:
+                        min_points = points
+                        min_hand = total_hand
+
+        min_hand2 = []
+        for i in min_hand:
+            if type(i) == Card:
+                min_hand2.append(i)
+        min_hand = min_hand2
+        return (min_points, min_hand)
+
+
 
 # full_deck = Deck(2)
 # player1 = Player("")
@@ -748,8 +908,11 @@ class Player():
 # # print(list(map(str, Set5)))
 
 
-# test_hand = [Card('5','hearts'),Card('7','diamonds'),Card('9','diamonds'),Card('6','diamonds'),Card('8','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
-# player1 = Player("Rohan", 0, test_hand)
+test_hand = [Card('K','hearts'),Card('7','diamonds'),Card('Q','diamonds'),Card('2','spades'),Card('J','clubs'),Card('9','clubs'),Card('7','clubs'),Card('8','diamonds'),Card('3','clubs'),Card('3','hearts'),Card('3','spades'),Card('7','hearts'),Card('6','clubs'),Card('6','hearts')]
+player1 = Player("Rohan", 0, test_hand)
+# points = player1.calculate_points()
+print(add_points(test_hand))
+# print(points[0])
 # player1.fill_all_possible()
 # allPossible = {}
 # acceptable = ["pure","impure","set"]
