@@ -835,7 +835,7 @@ def tutorial_check(mouse_pos, event):
 # computer = Player("ds", 0, test_hand)
 # computer_turn()
 ##########################
-before_game_reset()
+# before_game_reset()
 #GAME LOOP
 while running:
     screen.fill([220,220,220])
