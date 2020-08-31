@@ -6,9 +6,9 @@ A variation of the card game rummy using python and pygame.
 
 Deal Rummy is a game where there are x number of deals and the person that wins the highest amount of rounds is declared as the winner.
 
-![Homescreen](ReadMeAssets/Homescreen.png)
+![Homescreen](ReadmeAssets/Homescreen.png)
 
-![Gamescreen](ReadMeAssets/Gamescreen.png)
+![Gamescreen](ReadmeAssets/Gamescreen.png)
 
 You can see the gameplay in the ReadMeAssets folder.
 
